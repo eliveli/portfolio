@@ -1,14 +1,28 @@
+import React, {useRef} from "react";
 import {Contact, Home, Navbar, Project, Skill} from "./components";
 import styled from "styled-components";
 
 function App() {
+  // 여러 개의 ref를 하나로 묶기. [ref, ref, ref]
+  const sectionRef = useRef([]);
+  sectionRef.current = [0,0,0,0].map((element, index)=>React.createRef());
+  // 윗줄 끝부분 React.createRef() 가능. useRef 불가.
+
+  function scrollTo(index) {
+    sectionRef.current[index].current.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar handleScrollTo={scrollTo} />
       <MainPart>
+        <div ref={sectionRef.current[0]} />
         <Home />
-        <Project />
+        <div ref={sectionRef.current[1]} />
+        <Project/>
+        <div ref={sectionRef.current[2]} />
         <Skill />
+        <div ref={sectionRef.current[3]} />
         <Contact />
       </MainPart>
     </>
