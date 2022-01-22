@@ -39,20 +39,22 @@ const SkillContainer = styled.div`
     @media only screen and (min-width: 601px) and (max-width:767px) {
         grid-template-columns: repeat(3, 1fr);
         gap: 80px;
+        margin: 50px auto 100px;
     }
     @media only screen and (min-width: 768px) {
         grid-template-columns: repeat(3, 1fr);
         gap: 110px;
+        margin: 50px auto 110px;
     }
 
-    margin: 50px auto 110px;
+    margin: 50px auto 80px;
 `
 
 //각 스킬 별 컴포넌트
 const SkillItem = ({dataIcon,skillName,percentage}) => {
     return (
         <SkillItemContainer>
-            <span style={{color:"#444"}} class="iconify" data-icon={dataIcon} data-width="100" data-height="100"></span>
+            <SkillIcon className="iconify" data-icon={dataIcon}></SkillIcon>
             <SkillName>{skillName}</SkillName>
             <SkillPercentBox>
                 <SkillPercentFilled percent={percentage}/>
@@ -61,6 +63,25 @@ const SkillItem = ({dataIcon,skillName,percentage}) => {
     );
 }
 
+
+// api로 받는 아이콘의 크기 설정 시 다음의 두 방법 모두 가능.
+// 1. <span ... data-width="100" data-height="100">
+// 2. <span ... style={{width:"100px", height:"100px"}}> 
+// 여기에서는 2의 방법에 스타일드 컴포넌트를 활용했고,
+// 결국 화면 너비에 따라 아이콘 크기를 다르게 설정할 수 있었음(방법 2로 바꾼 이유)
+const SkillIcon = styled.span`
+    width:65px;
+    height:65px;
+    color: #555;
+    @media only screen and (min-width: 400px) and (max-width: 767px) {
+        width:80px;
+        height:80px;
+    }
+    @media only screen and (min-width: 768px) {
+        width:100px;
+        height:100px;
+    }
+`
 SkillItem.defaultProps = {
     dataIcon: "",
     skillName: "",
@@ -86,5 +107,5 @@ const SkillPercentBox = styled.div`
 `
 const SkillPercentFilled = styled.div`
     width: ${(props) => props.percent}%;
-    background-color: #444;
+    background-color: #555;
 `
