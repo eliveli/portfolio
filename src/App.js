@@ -18,10 +18,10 @@ function App() {
       <MainPart>
         <div ref={sectionRef.current[0]} />
         <Home />
-        <div ref={sectionRef.current[1]} />
-        <Project/>
         <div ref={sectionRef.current[2]} />
         <Skill />
+        <div ref={sectionRef.current[1]} />
+        <Project/>
         <div ref={sectionRef.current[3]} />
         <Contact />
       </MainPart>
