@@ -1,8 +1,19 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Text from './elements/Text';
 import styled from "styled-components";
 
 export default function Contact() {
+
+    // 플랫폼별 연락처 보여주기(true or false)
+    const [isContact1, setIsContact1] = useState(false);
+    const [isContact2, setIsContact2] = useState(false);
+    const [isContact3, setIsContact3] = useState(false);
+    const toggleContact = (isContact, setIsContact) => {
+        console.log(isContact,"beforeClick")
+        if (isContact) return setIsContact(false);
+        return setIsContact(true);
+    }
+
     return (
         <Section>
             <Text isTittle={true}>Contact</Text>
@@ -16,9 +27,9 @@ export default function Contact() {
 
             {/* 플랫폼별 연락처 */}
             <ContactInfoContainer>
-                <ContactItem dataIcon="simple-icons:gmail" platform="메일" />
-                <ContactItem dataIcon="majesticons:messages-line" platform="문자" />
-                <ContactItem dataIcon="vs:kakaotalk" platform="카톡" />
+                <ContactItem dataIcon="simple-icons:gmail" platform="메일" contactInfo="elivevvv @ gmail.com" isContactInfo={isContact1} handleContactInfo={()=>toggleContact(isContact1,setIsContact1)} />
+                <ContactItem dataIcon="majesticons:messages-line" platform="문자" contactInfo="010 4935 7502" isContactInfo={isContact2} handleContactInfo={()=>toggleContact(isContact2,setIsContact2)} />
+                <ContactItem dataIcon="vs:kakaotalk" platform="카톡" contactInfo="Slolo2" isContactInfo={isContact3} handleContactInfo={()=>toggleContact(isContact3,setIsContact3)} />
             </ContactInfoContainer>
         </Section>);
       }
@@ -56,12 +67,15 @@ const ContactInfoContainer = styled.div`
 `
 
 
-// 각 연락처 플랫폼
-const ContactItem = ({dataIcon,platform}) => {
+// 각 연락처 플랫폼. 아이콘 클릭 시 연락처 open or close
+const ContactItem = ({dataIcon,platform,contactInfo,isContactInfo,handleContactInfo}) => {
     return (
-        <SkillItemContainer>
+        // onClick 이벤트핸들러 component 적용 가능. not only element
+        <SkillItemContainer onClick={handleContactInfo}>
             <PlatformIcon className="iconify" data-icon={dataIcon}></PlatformIcon>
             <SkillName>{platform}</SkillName>
+            {isContactInfo && <OpenedInfoBox><OpenedInfo>{contactInfo}</OpenedInfo></OpenedInfoBox> } 
+            {/* 바로 윗줄, 새로 추가되는 노드는 컴포넌트 맨 위에 위치하면(두 줄 위로 이동 시) 적용 안 됨(추가정보필요) */}
         </SkillItemContainer>
     );
 }
@@ -75,6 +89,8 @@ const SkillItemContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    position: relative;
     
     width: 20%;
     min-width: 65px;
@@ -83,6 +99,27 @@ const SkillItemContainer = styled.div`
     /* width %로 적용 시 부모에 대한 비율/형제와의 간격을 고려 */
     /* (유의) width 100%를 넣으면 상위 element에 주었던 justify content 정렬이 안 먹힘 */
 `
+
+// 아이콘 클릭 시 보여줄 정보
+const OpenedInfoBox = styled.div`
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.8);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`
+const OpenedInfo = styled.p`
+    color: black;
+    z-index: 2;
+    text-align: center;
+    font-size: 25px;
+    font-weight: 900;
+`
+
 const PlatformIcon = styled.span`
     width:100%;
     height:auto;
