@@ -1,7 +1,7 @@
 import Contact from "./Contact";
 import Home from "./Home";
 import Navbar from "./Navbar";
-import Project from "./Project";
+import Projects from "./Projects";
 import Skill from "./Skill";
 
-export {Contact, Home, Navbar, Project, Skill};
+export {Contact, Home, Navbar, Projects, Skill};
