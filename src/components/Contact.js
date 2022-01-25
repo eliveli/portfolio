@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
-import Text from './elements/Text';
+import {Text, Icon} from './elements';
 import styled from "styled-components";
+
 
 export default function Contact() {
 
@@ -72,7 +73,7 @@ const ContactItem = ({dataIcon,platform,contactInfo,isContactInfo,handleContactI
     return (
         // onClick 이벤트핸들러 component 적용 가능. not only element
         <SkillItemContainer onClick={handleContactInfo}>
-            <PlatformIcon className="iconify" data-icon={dataIcon}></PlatformIcon>
+            <Icon dataIcon={dataIcon} color="#666" ></Icon>
             <SkillName>{platform}</SkillName>
             {isContactInfo && <OpenedInfoBox><OpenedInfo>{contactInfo}</OpenedInfo></OpenedInfoBox> } 
             {/* 바로 윗줄, 새로 추가되는 노드는 컴포넌트 맨 위에 위치하면(두 줄 위로 이동 시) 적용 안 됨(추가정보필요) */}
@@ -118,14 +119,6 @@ const OpenedInfo = styled.p`
     text-align: center;
     font-size: 25px;
     font-weight: 900;
-`
-
-const PlatformIcon = styled.span`
-    width:100%;
-    height:auto;
-    color: #666;
-    /* api로 받아 와 element에 적용하는 아이콘도 width % 설정 가능 */
-    /* (유의) 부모/조상 element의 width를 명확히 설정해야 함 */
 `
 const SkillName = styled.span`
     width: 100%;
