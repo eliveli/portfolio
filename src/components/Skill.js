@@ -1,19 +1,21 @@
 import React from 'react';
-import Text from './elements/Text';
+import {Text,Icon} from './elements';
 import styled from "styled-components";
 
 export default function Skill() {
+
+    // props to SkillItem component
+    const propsDataIcon = ["fontisto:html5","simple-icons:css3","teenyicons:javascript-outline","akar-icons:react-fill","file-icons:typescript","grommet-icons:node"];
+    const propsSkillName = ["HTML","CSS","JAVASCRIPT","REACT","TYPESCRIPT","NODE.JS"];
+    const propsPercent = [90,90,85,80,80,70,50];
     return (
         <Section>
             <Text isTittle={true}>Skills</Text>
             <Text>My skills are ...</Text>
             <SkillContainer>
-                <SkillItem dataIcon="fontisto:html5" skillName="HTML" percentage={90} />
-                <SkillItem dataIcon="simple-icons:css3" skillName="CSS" percentage={85} />
-                <SkillItem dataIcon="teenyicons:javascript-outline" skillName="JAVASCRIPT" percentage={80} />
-                <SkillItem dataIcon="akar-icons:react-fill" skillName="REACT" percentage={80} />
-                <SkillItem dataIcon="file-icons:typescript" skillName="TYPESCRIPT" percentage={60} />
-                <SkillItem dataIcon="grommet-icons:node" skillName="NODE.JS" percentage={50} />
+                {Array.from({length:6}, (e,index) => 
+                    <SkillItem key={`skillItem{index}`} dataIcon={propsDataIcon[index]} skillName={propsSkillName[index]} percentage={propsPercent[index]} />
+                )}
             </SkillContainer>
         </Section>);
 }
@@ -31,6 +33,7 @@ const SkillContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 40px;
+    margin: 50px auto 80px;
 
     @media only screen and (min-width: 412px) and (max-width:600px) {
         gap: 60px;
@@ -41,20 +44,22 @@ const SkillContainer = styled.div`
         gap: 80px;
         margin: 50px auto 100px;
     }
+    /* 768px~ 타블렛 사이즈 */
     @media only screen and (min-width: 768px) {
         grid-template-columns: repeat(3, 1fr);
         gap: 110px;
         margin: 50px auto 110px;
     }
 
-    margin: 50px auto 80px;
 `
 
 //각 스킬 별 컴포넌트
 const SkillItem = ({dataIcon,skillName,percentage}) => {
     return (
         <SkillItemContainer>
-            <SkillIcon className="iconify" data-icon={dataIcon}></SkillIcon>
+            <IconContainer>
+                <Icon color="#555" dataIcon={dataIcon}></Icon>
+            </IconContainer>
             <SkillName>{skillName}</SkillName>
             <SkillPercentBox>
                 <SkillPercentFilled percent={percentage}/>
@@ -67,12 +72,11 @@ const SkillItem = ({dataIcon,skillName,percentage}) => {
 // api로 받는 아이콘의 크기 설정 시 다음의 두 방법 모두 가능.
 // 1. <span ... data-width="100" data-height="100">
 // 2. <span ... style={{width:"100px", height:"100px"}}> 
-// 여기에서는 2의 방법에 스타일드 컴포넌트를 활용했고,
+// 여기에서는 2의 방법에 styled component를 활용했고,
 // 결국 화면 너비에 따라 아이콘 크기를 다르게 설정할 수 있었음(방법 2로 바꾼 이유)
-const SkillIcon = styled.span`
+const IconContainer = styled.div`
     width:65px;
     height:65px;
-    color: #555;
     @media only screen and (min-width: 400px) and (max-width: 767px) {
         width:80px;
         height:80px;
