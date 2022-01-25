@@ -1,19 +1,17 @@
 import React, {useState} from 'react';
 import {Text, Icon} from './elements';
+import useModal from '../hooks/useModal';
 import styled from "styled-components";
 
 
 export default function Contact() {
 
-    // 플랫폼별 연락처 보여주기(true or false)
-    const [isContact1, setIsContact1] = useState(false);
-    const [isContact2, setIsContact2] = useState(false);
-    const [isContact3, setIsContact3] = useState(false);
-    const toggleContact = (isContact, setIsContact) => {
-        console.log(isContact,"beforeClick")
-        if (isContact) return setIsContact(false);
-        return setIsContact(true);
-    }
+   // 플랫폼별 연락처 보여줄 모달 설정 함수 모음
+  const contactModals = [useModal(),useModal(),useModal()];
+  // props to ContacctItem component 
+  const propsDataIcon = ["simple-icons:gmail","majesticons:messages-line","vs:kakaotalk"];
+  const propsPlatform = ["메일","문자","카톡"];
+  const propsContactInfo = ["elivevvv @ gmail.com","010 4935 7502","Slolo2"];
 
     return (
         <Section>
@@ -28,9 +26,9 @@ export default function Contact() {
 
             {/* 플랫폼별 연락처 */}
             <ContactInfoContainer>
-                <ContactItem dataIcon="simple-icons:gmail" platform="메일" contactInfo="elivevvv @ gmail.com" isContactInfo={isContact1} handleContactInfo={()=>toggleContact(isContact1,setIsContact1)} />
-                <ContactItem dataIcon="majesticons:messages-line" platform="문자" contactInfo="010 4935 7502" isContactInfo={isContact2} handleContactInfo={()=>toggleContact(isContact2,setIsContact2)} />
-                <ContactItem dataIcon="vs:kakaotalk" platform="카톡" contactInfo="Slolo2" isContactInfo={isContact3} handleContactInfo={()=>toggleContact(isContact3,setIsContact3)} />
+                {Array.from({length:3}, (e,index) => 
+                    <ContactItem key={`contactItem${index}`} dataIcon={propsDataIcon[index]} platform={propsPlatform[index]} contactInfo={propsContactInfo[index]} isContactInfo={contactModals[index].isModal} handleContactInfo={contactModals[index].toggleModal} />
+                )}
             </ContactInfoContainer>
         </Section>);
       }
