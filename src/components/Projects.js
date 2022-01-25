@@ -3,6 +3,7 @@ import Text from './elements/Text';
 import styled from "styled-components";
 import ProjectModal from "./ProjectModal";
 import useModal from '../hooks/useModal';
+import { projectInfo } from '../assets/projectInfo';
 import imgEx from "../assets/ImgEx.png";
 
 const Projects = () => {
@@ -17,11 +18,6 @@ const Projects = () => {
 
   // 모달이 활성화될 프로젝트의 index
   const trueModalIndex = projectModals.findIndex((e)=>e.isModal);
-
-  // 프로젝트별 내용
-  const projectInfo = [
-
-  ];
 
   return(
   <Section>
