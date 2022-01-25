@@ -14,7 +14,7 @@ export default function Skill() {
             <Text>My skills are ...</Text>
             <SkillContainer>
                 {Array.from({length:6}, (e,index) => 
-                    <SkillItem key={`skillItem{index}`} dataIcon={propsDataIcon[index]} skillName={propsSkillName[index]} percentage={propsPercent[index]} />
+                    <SkillItem key={`skillItem${index}`} dataIcon={propsDataIcon[index]} skillName={propsSkillName[index]} percentage={propsPercent[index]} />
                 )}
             </SkillContainer>
         </Section>);

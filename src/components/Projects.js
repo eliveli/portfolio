@@ -29,7 +29,7 @@ const Projects = () => {
       <Text>My projects are ...</Text>
       <ImgContainer>
         {Array.from({length:4}, (e, index) => 
-          <img width="100%" src={projectImgs[index]} alt="projectImg" onClick={projectModals[index].toggleModal}/>
+          <img key={`ProjectImg${index}`} width="100%" src={projectImgs[index]} alt="projectImg" onClick={projectModals[index].toggleModal}/>
         )}
 
         {/* 활성화되는 모달 */}
