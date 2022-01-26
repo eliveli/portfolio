@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Icon } from './elements';
 import useModal from '../hooks/useModal';
@@ -10,12 +10,17 @@ export default function Navbar({handleScrollTo}) {
       toggleModal();
       toggleIsSlideIn(true);
       return;
-    } // 최초 모달 오픈 : modal true & slide true
-    
-    toggleIsSlideIn(!isSlideIn);
-     // 이후 : slide state만 변경(true or false). 모달 state true 유지. 
-     // 이 방법이 가능하려면 animation 종료 후 animation 마지막 상태 유지 필요(animation-fill-mode: forwards;) 
+    } // 처음 모달 open : modal true & slideIn true
+    toggleIsSlideIn(!isSlideIn); // 모달 on (true) 일 때 slide out
   }
+
+  // slide out 이후 모달 off.
+  // slide out 시간 소요되기에 setTimeout 이용, 기다린 후 모달 off.
+  useEffect(()=>{
+    if (isModal && !isSlideIn) {
+      setTimeout(()=>toggleModal(false), 1000);
+    }
+  }, [isSlideIn]);
 
   return (
     <NavBar>
@@ -105,10 +110,10 @@ const LiTablet = styled.li`
 
 `
 
-// animation slide in/ slide out
+// animation slide in or slide out
 const slidingIn = keyframes`
   from{
-    left:-100%;
+    left:-100vw;
   }
   to{
     left:0;
@@ -119,7 +124,7 @@ const slidingOut = keyframes`
     left:0;
   }
   to{
-    left:-100%;
+    left:-100vw;
   }
 `
 const UlMobile = styled.ul`
