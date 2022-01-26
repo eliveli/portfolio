@@ -4,11 +4,7 @@ import {useState} from 'react';
 export default function useModal() {
     const [isModal, setModal] = useState(false);
     const toggleModal = () => {
-        if (isModal) {
-            setModal(false);
-            return;
-        }
-        setModal(true);
+        setModal(!isModal);
     }
   return {isModal, toggleModal};
 }

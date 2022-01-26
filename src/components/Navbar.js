@@ -1,17 +1,48 @@
-import React from 'react';
-import styled from 'styled-components';
-
+import {useState} from 'react';
+import styled, { keyframes } from 'styled-components';
+import { Icon } from './elements';
+import useModal from '../hooks/useModal';
 export default function Navbar({handleScrollTo}) {
+  const {isModal, toggleModal} = useModal();
+  const [isSlideIn, toggleIsSlideIn] = useState(true); //state for animation: slide in or slide out
+  const handleSlide = () => {
+    if (!isModal) {
+      toggleModal();
+      toggleIsSlideIn(true);
+      return;
+    } // 최초 모달 오픈 : modal true & slide true
+    
+    toggleIsSlideIn(!isSlideIn);
+     // 이후 : slide state만 변경(true or false). 모달 state true 유지. 
+     // 이 방법이 가능하려면 animation 종료 후 animation 마지막 상태 유지 필요(animation-fill-mode: forwards;) 
+  }
 
   return (
     <NavBar>
-        <img src="" alt="logo"></img>
-        <Ul>
-            <Li><span onClick={()=>handleScrollTo(0)}>Home</span></Li>
-            <Li><span onClick={()=>handleScrollTo(1)}>Projects</span></Li>
-            <Li><span onClick={()=>handleScrollTo(2)}>Skills</span></Li>
-            <Li><span onClick={()=>handleScrollTo(3)}>Contact</span></Li>
-        </Ul>
+        {/* 모바일용 햄버거 버튼 */}
+        <BurgerContainer onClick={handleSlide}>
+          <Icon dataIcon="charm:menu-hamburger" width="40px" height="40px" /> 
+        </BurgerContainer>
+
+        <LogoContainer>
+          <img src="" alt="logo"></img>
+        </LogoContainer>
+
+        {/* 태블릿 사이즈~ 뷰*/}
+        <UlTablet>
+            {["Home","Skills","Projects","Contact"].map((section,idx)=>
+              <LiTablet key={`Nav${idx}`}><span onClick={()=>handleScrollTo(idx)}>{section}</span></LiTablet>
+            )}
+        </UlTablet>
+
+        {/* 모바일 사이즈 뷰*/}
+        {isModal && 
+        <UlMobile isSlideIn={isSlideIn}>
+            {["Home","Skills","Projects","Contact"].map((section,idx)=>
+              <LiMobile key={`Nav${idx}`}><span onClick={()=>{handleScrollTo(idx);handleSlide();}}>{section}</span></LiMobile>
+            )}
+        </UlMobile>
+        }
     </NavBar>
   )
 
@@ -38,13 +69,81 @@ const NavBar = styled.nav`
 
     max-width: 800px;
     margin: 0 auto;
+
+    @media screen and (max-width: 767px) {
+      justify-content: center;
+
+    }
 `
-const Ul = styled.ul`
+const LogoContainer = styled.div`
+
+    @media screen and (max-width: 767px) {
+
+    }
+
+`
+const BurgerContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+    @media screen and (min-width: 768px) {
+      display: none;
+    }
+`
+const UlTablet = styled.ul`
   list-style-type: none;
   margin: 0;
   padding: 0;
+  @media screen and (max-width: 767px) {
+    display: none;
+  }
 `
-const Li = styled.li`
-    display: inline;
-    margin-left: 24px;
+const LiTablet = styled.li`
+  display: inline;
+  margin-left: 24px;
+
+`
+
+// animation slide in/ slide out
+const slidingIn = keyframes`
+  from{
+    left:-100%;
+  }
+  to{
+    left:0;
+  }
+`
+const slidingOut = keyframes`
+  from{
+    left:0;
+  }
+  to{
+    left:-100%;
+  }
+`
+const UlMobile = styled.ul`
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(120,200,100,0.8);
+
+  animation-name:${(props)=>props.isSlideIn? slidingIn : slidingOut};
+  animation-direction: normal;
+  animation-duration:0.5s;
+  animation-fill-mode: forwards; //애니메이션 종료 후 마지막 keyframe 값 유지(중요!)
+  
+`
+const LiMobile = styled.li`
+  margin-left: 24px;
 `

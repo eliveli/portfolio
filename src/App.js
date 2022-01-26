@@ -1,5 +1,5 @@
 import React, {useRef} from "react";
-import {Contact, Home, Navbar, Project, Skill} from "./components";
+import {Contact, Home, Navbar, Projects, Skill} from "./components";
 import styled from "styled-components";
 
 function App() {
@@ -18,10 +18,10 @@ function App() {
       <MainPart>
         <div ref={sectionRef.current[0]} />
         <Home />
-        <div ref={sectionRef.current[2]} />
-        <Skill />
         <div ref={sectionRef.current[1]} />
-        <Project/>
+        <Skill />
+        <div ref={sectionRef.current[2]} />
+        <Projects/>
         <div ref={sectionRef.current[3]} />
         <Contact />
       </MainPart>
