@@ -25,13 +25,13 @@ const Projects = () => {
       <Text>My projects are ...</Text>
       <ImgContainer>
         {Array.from({length:4}, (e, index) => 
-          <img key={`ProjectImg${index}`} width="100%" src={projectImgs[index]} alt="projectImg" onClick={projectModals[index].toggleModal}/>
+          <img key={`ProjectImg${index}`} width="100%" src={projectImgs[index]} alt="projectImg" onClick={projectModals[index].handleModal}/>
         )}
 
         {/* 활성화되는 모달 */}
         {trueModalIndex !== -1 && 
           <ProjectModal projectInfo={projectInfo[trueModalIndex]}
-              closeModal={projectModals[trueModalIndex].toggleModal} />
+              closeModal={projectModals[trueModalIndex].handleModal} />
         }
       </ImgContainer>
   </Section>

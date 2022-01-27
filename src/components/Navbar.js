@@ -3,29 +3,12 @@ import styled, { keyframes } from 'styled-components';
 import { Icon } from './elements';
 import useModal from '../hooks/useModal';
 export default function Navbar({handleScrollTo}) {
-  const {isModal, toggleModal} = useModal();
-  const [isSlideIn, toggleIsSlideIn] = useState(true); //state for animation: slide in or slide out
-  const handleSlide = () => {
-    if (!isModal) {
-      toggleModal();
-      toggleIsSlideIn(true);
-      return;
-    } // 처음 모달 open : modal true & slideIn true
-    toggleIsSlideIn(!isSlideIn); // 모달 on (true) 일 때 slide out
-  }
-
-  // slide out 이후 모달 off.
-  // slide out 시간 소요되기에 setTimeout 이용, 기다린 후 모달 off.
-  useEffect(()=>{
-    if (isModal && !isSlideIn) {
-      setTimeout(()=>toggleModal(false), 1000);
-    }
-  }, [isSlideIn]);
+  const {isModal, handleModal, isShowOn} = useModal();
 
   return (
     <NavBar>
         {/* 모바일용 햄버거 버튼 */}
-        <BurgerContainer onClick={handleSlide}>
+        <BurgerContainer onClick={handleModal}>
           <Icon dataIcon="charm:menu-hamburger" width="40px" height="40px" /> 
         </BurgerContainer>
 
@@ -42,9 +25,9 @@ export default function Navbar({handleScrollTo}) {
 
         {/* 모바일 사이즈 뷰*/}
         {isModal && 
-        <UlMobile isSlideIn={isSlideIn}>
+        <UlMobile isShowOn={isShowOn}>
             {["Home","Skills","Projects","Contact"].map((section,idx)=>
-              <LiMobile key={`Nav${idx}`}><span onClick={()=>{handleScrollTo(idx);handleSlide();}}>{section}</span></LiMobile>
+              <LiMobile key={`Nav${idx}`}><span onClick={()=>{handleScrollTo(idx);handleModal();}}>{section}</span></LiMobile>
             )}
         </UlMobile>
         }
@@ -111,7 +94,7 @@ const LiTablet = styled.li`
 `
 
 // animation slide in or slide out
-const slidingIn = keyframes`
+const slideIn = keyframes`
   from{
     left:-100vw;
   }
@@ -119,7 +102,7 @@ const slidingIn = keyframes`
     left:0;
   }
 `
-const slidingOut = keyframes`
+const slideOut = keyframes`
   from{
     left:0;
   }
@@ -143,7 +126,7 @@ const UlMobile = styled.ul`
   height: 100vh;
   background-color: rgba(120,200,100,0.8);
 
-  animation-name:${(props)=>props.isSlideIn? slidingIn : slidingOut};
+  animation-name:${(props)=>props.isShowOn? slideIn : slideOut};
   animation-direction: normal;
   animation-duration:0.5s;
   animation-fill-mode: forwards; //애니메이션 종료 후 마지막 keyframe 값 유지(중요!)

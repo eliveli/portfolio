@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Text, Icon} from './elements';
 import useModal from '../hooks/useModal';
 import styled from "styled-components";
@@ -27,7 +27,7 @@ export default function Contact() {
             {/* 플랫폼별 연락처 */}
             <ContactInfoContainer>
                 {Array.from({length:3}, (e,index) => 
-                    <ContactItem key={`contactItem${index}`} dataIcon={propsDataIcon[index]} platform={propsPlatform[index]} contactInfo={propsContactInfo[index]} isContactInfo={contactModals[index].isModal} handleContactInfo={contactModals[index].toggleModal} />
+                    <ContactItem key={`contactItem${index}`} dataIcon={propsDataIcon[index]} platform={propsPlatform[index]} contactInfo={propsContactInfo[index]} isContactInfo={contactModals[index].isModal} handleContactInfo={contactModals[index].handleModal} />
                 )}
             </ContactInfoContainer>
         </Section>);
@@ -67,22 +67,21 @@ const ContactInfoContainer = styled.div`
 
 
 // 각 연락처 플랫폼. 아이콘 클릭 시 연락처 open or close
-const ContactItem = ({dataIcon,platform,contactInfo,isContactInfo,handleContactInfo}) => {
+const ContactItem = (props) => {
+    const {dataIcon,platform,contactInfo,isContactInfo,handleContactInfo} = props;
     return (
         // onClick 이벤트핸들러 component 적용 가능. not only element
         <SkillItemContainer onClick={handleContactInfo}>
             <Icon dataIcon={dataIcon} color="#666" ></Icon>
             <SkillName>{platform}</SkillName>
-            {isContactInfo && <OpenedInfoBox><OpenedInfo>{contactInfo}</OpenedInfo></OpenedInfoBox> } 
+            {isContactInfo && 
+             <OpenedInfoBox>
+                 <OpenedInfo>{contactInfo}</OpenedInfo>
+             </OpenedInfoBox> }
             {/* 바로 윗줄, 새로 추가되는 노드는 컴포넌트 맨 위에 위치하면(두 줄 위로 이동 시) 적용 안 됨(추가정보필요) */}
         </SkillItemContainer>
-    );
-}
+    )}
 
-ContactItem.defaultProps = {
-    dataIcon: "",
-    platform: "",
-}
 
 const SkillItemContainer = styled.div`
     display: flex;
