@@ -3,6 +3,20 @@ import styled from 'styled-components';
 import { Icon } from './elements';
 export default function ProjectModal({projectInfo, closeModal}) {
 
+    // 모달 바깥 영역 클릭 시 모달 닫기. show off & modal off
+    const modalRef = useRef(); //모달 요소 ref
+    const offModal = (e) => { 
+        if (!modalRef.current.contains(e.target)) closeModal();
+    };
+    useEffect(()=>{
+        window.addEventListener("click", offModal);
+        return () => {
+            window.removeEventListener("click", offModal);
+        }
+    }, []);
+
+    
+
     // 이미지 컨테이너의 width 값 가져오기 //
     // (~.current는 undefined라 useEffect 이용, 렌더링 이후 state 설정)
     // (state로 설정해 렌더링 이후에도 값 유지)
@@ -26,7 +40,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
 
   return (
     <Background>
-       <Article>
+       <Article ref={modalRef}>
             <XContainer onClick={closeModal}>
                 <Icon color="#777" dataIcon="gg:close"></Icon>
             </XContainer>
@@ -68,7 +82,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
                     {[{text:"사이트 보러가기",address:projectInfo.siteAddress}
                       ,{text:"깃허브 보러가기",address:projectInfo.githubAddress}
                      ].map((e)=>
-                        <LinkTo href={e.address} target="_blank" rel="noopener noreferrer">
+                        <LinkTo key={e.text} href={e.address} target="_blank" rel="noopener noreferrer">
                             <ViewButton>{e.text}</ViewButton>
                         </LinkTo>
                       )
