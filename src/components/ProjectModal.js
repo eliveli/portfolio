@@ -20,7 +20,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
 
 
 
-    // 프로젝트 정보 보여주는 모달(+버튼 클릭 시)
+    // 프로젝트 정보 보여주는 모달(paper버튼 클릭 시)
     const { isModal, handleModal, isShowOn} = useModal();
     const isInfo = isModal
     const handleInfo= ()=> handleModal()
@@ -30,19 +30,33 @@ export default function ProjectModal({projectInfo, closeModal}) {
 
 
 
+
     // 이미지 컨테이너의 width 값 가져오기 //
     // (~.current는 undefined라 useEffect 이용, 렌더링 이후 state 설정)
     // (state로 설정해 렌더링 이후에도 값 유지)
-    const imgWidthRef = useRef();
+    const imgContainer = useRef();
+    const imgWidth = useComponentWidth(imgContainer); //이미지width 가져오기
 
-    const imgWidth = useComponentWidth(imgWidthRef); //이미지width 가져오기
+
+    // 디바이스별 이미지
+    const {mobile, tablet, desktop} = projectInfo.img;
+    const device = [mobile, tablet, desktop]; //배열에 담아 인덱스로 접근(for <DeviceContainer> 컴포넌트)
+    const [deviceImg, setDeviceImg] = useState(mobile);
+    const handleDevice = (idx) => {
+        setDeviceImg(device[idx]);
+
+        // 디바이스 변경 시 x좌표 및 스크롤위치 초기화. 이미지 개수가 많은 디바이스에서 적은 디바이스로 변경 시 설정된 이미지 x좌표에 이미지가 없거나 y좌표가 여백일 수 있기 때문.
+        changeImageX(0);
+        imgContainer.current?.scrollTo(0,0);
+    }
+
 
     // 현재 이미지앨범 X좌표
     const [imageX, changeImageX] = useState(0);
 
     // 처음&마지막 이미지 X좌표 (좌우 화살표 표시 여부 결정)
     const firstImgX = 0;
-    const lastImgX = -imgWidth*(projectInfo.img.length-1);
+    const lastImgX = -imgWidth*(deviceImg.length-1);
 
     // 이미지 슬라이드 기능 //
     // 이미지 앨범 안에 이미지 요소를 여럿 넣고 이미지앨범을 x축 방향으로 좌우 이동.
@@ -54,24 +68,39 @@ export default function ProjectModal({projectInfo, closeModal}) {
     // debounce 이용 렌더링 줄임. & useCallback(함수재사용. 큰 효과는 없지만..?)
     const [arrowY, setArrowY] = useState(0);
     const moveArrow = (value) => {
-        setArrowY(value); console.log(value)
+        setArrowY(value);
     }
     const handleMoveArrow = useCallback(debounce(moveArrow, 200), []);
     const handleScroll = (e) => {
         handleMoveArrow(e.target.scrollTop);
     }
 
+
+
+
+        
     return (
     <Background>
        <Article ref={modalRef}>
-            <XContainer onClick={closeModal}>
-                <Icon color="#777" dataIcon="gg:close"></Icon>
-            </XContainer>
+            <TopContainer>
+                <div>
+                {["ic:outline-phone-iphone","gridicons:tablet","fa-solid:desktop"]
+                .map((dataIcon,idx)=>
+                    <DeviceContainer onClick={()=>handleDevice(idx)} key={dataIcon}>
+                        <Icon color="#777" dataIcon={dataIcon}></Icon>
+                    </DeviceContainer>
+                )}
+                </div>
+
+                <XContainer onClick={closeModal}>
+                    <Icon color="#777" dataIcon="gg:close"></Icon>
+                </XContainer>
+            </TopContainer>
 
             {/* 이미지 슬라이드 */}
-            <ImgContainer ref={imgWidthRef} onScroll={handleScroll}>
+            <ImgContainer ref={imgContainer} onScroll={handleScroll}>
                 <ImgAlbum moveTo={imageX}>
-                    {projectInfo.img.map((e,idx) => 
+                    {deviceImg.map((e,idx) => 
                       <ProjectImg width={imgWidth} key={e+idx} src={e} alt="project image" />
                     )}
                 
@@ -91,18 +120,20 @@ export default function ProjectModal({projectInfo, closeModal}) {
                         </SizingArrowContainer>
                     }
                 </ArrowContainer>
+
+
+                {isInfo &&
+                <ProjectInfoContainer>
+                    <ProjectTittle>
+                        {projectInfo.tittle}
+                    </ProjectTittle>
+                    <ProjectDesc>
+                        {projectInfo.desc}
+                    </ProjectDesc>
+                </ProjectInfoContainer>
+                }
             </ImgContainer>
 
-        {isInfo &&
-            <ProjectInfoContainer>
-                <ProjectTittle>
-                    {projectInfo.tittle}
-                </ProjectTittle>
-                <ProjectDesc>
-                    {projectInfo.desc}
-                </ProjectDesc>
-           </ProjectInfoContainer>
-        }
             <ViewButtonContainer>
                 {[{text:"사이트 보러가기",address:projectInfo.siteAddress}
                     ,{text:"깃허브 보러가기",address:projectInfo.githubAddress}
@@ -114,13 +145,15 @@ export default function ProjectModal({projectInfo, closeModal}) {
                 }
             </ViewButtonContainer>
 
+
+            <PaperContainer onClick={handleInfo}>
+                <Icon color="#777" dataIcon="ph:scroll-duotone"></Icon>
+            </PaperContainer>
+
             <ScrollContainer>
-                <Icon color="#777" dataIcon="iconoir:mouse-scroll-wheel"></Icon>
+                <Icon color="#777" dataIcon="fluent:arrow-bidirectional-up-down-16-filled"></Icon>
             </ScrollContainer>
 
-            <PlusContainer onClick={handleInfo}>
-                <Icon color="#777" dataIcon="akar-icons:circle-plus"></Icon>
-            </PlusContainer>
 
        </Article>
     </Background>
@@ -148,8 +181,8 @@ const Background = styled.div`
 
 `
 const Article = styled.article`
-    width: 80%;
-    height: 80%;
+    width: 100%;
+    height: 100%;
     background-color: aqua;
 
     position: relative;
@@ -162,11 +195,25 @@ const Article = styled.article`
     }
 
 `
-const XContainer = styled.div`
-    position: absolute;
-    top: 0;
-    right: 0;
+const TopContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+`
+const DeviceContainer = styled.div`
+    display: inline-block;
 
+    width: 25px;
+    height: 25px;
+    background-color: rgba(255,255,255,0.5);
+    border: 2px solid #777;
+    border-radius: 20%;
+    
+    @media only screen and (min-width:768px) {
+        width: 40px;
+        height: 40px;
+    }
+`
+const XContainer = styled.div`
     z-index: 4;
 
     width: 25px;
@@ -192,8 +239,6 @@ const ImgContainer = styled.div`
     -ms-overflow-style: none;
     &::-webkit-scrollbar{ display:none; }
     /* 내부 스크롤바 없애기 */
-
-
 
     @media only screen and (min-width:1024px) {
         width:60%;
@@ -224,9 +269,9 @@ const ArrowContainer = styled.div`
     align-items: center;
 `
 const SizingArrowContainer = styled.div`
-    z-index: 5;
     width: 25px;
     height: 25px;
+    
     @media only screen and (min-width:768px) {
         width: 40px;
         height: 40px;
@@ -258,9 +303,9 @@ const ProjectInfoContainer = styled.div`
     height: 100%;
     top: 0;
 
-    z-index:4;
+    z-index:5;
     @media only screen and (min-width:1024px) {
-        left: 100%;
+        /* left: 100%; */
     }
 `
 const ProjectTittle = styled.h2`
@@ -293,16 +338,19 @@ const ScrollContainer = styled.div`
 
     z-index: 4;
 
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
 
     @media only screen and (min-width:768px) {
     }
 `
-const PlusContainer = styled.div`
+const PaperContainer = styled.div`
     position: absolute;
-    bottom: 0;
-    right: -10%;
+    bottom: 60px;
+    left: 0;
+
+    background-color: rgba(255,255,255,0.8);
+    border-radius: 50%;
 
     z-index: 4;
 
