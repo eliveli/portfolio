@@ -1,30 +1,41 @@
-import {useState, useRef, useEffect} from 'react';
+import {useState, useRef, useEffect, useCallback} from 'react';
 import styled from 'styled-components';
 import { Icon } from './elements';
+import useModal from '../hooks/useModal';
+import useComponentWidth from '../hooks/useComponentWidth';
+import {debounce} from "lodash";
 export default function ProjectModal({projectInfo, closeModal}) {
 
     // 모달 바깥 영역 클릭 시 모달 닫기. show off & modal off
     const modalRef = useRef(); //모달 요소 ref
-    const offModal = (e) => { 
-        if (!modalRef.current.contains(e.target)) closeModal();
-    };
-    useEffect(()=>{
-        window.addEventListener("click", offModal);
-        return () => {
-            window.removeEventListener("click", offModal);
-        }
-    }, []);
+    // const offModal = (e) => { 
+    //     if (!modalRef.current.contains(e.target)) closeModal();
+    // };
+    // useEffect(()=>{
+    //     window.addEventListener("click", offModal);
+    //     return () => {
+    //         window.removeEventListener("click", offModal);
+    //     }
+    // }, []);
 
+
+
+    // 프로젝트 정보 보여주는 모달(+버튼 클릭 시)
+    const { isModal, handleModal, isShowOn} = useModal();
+    const isInfo = isModal
+    const handleInfo= ()=> handleModal()
     
+
+
+
+
 
     // 이미지 컨테이너의 width 값 가져오기 //
     // (~.current는 undefined라 useEffect 이용, 렌더링 이후 state 설정)
     // (state로 설정해 렌더링 이후에도 값 유지)
     const imgWidthRef = useRef();
-    const [imgWidth,setImgWidth] = useState(0);
-    useEffect(()=>{
-        setImgWidth(imgWidthRef.current.offsetWidth);
-    }, [])
+
+    const imgWidth = useComponentWidth(imgWidthRef); //이미지width 가져오기
 
     // 현재 이미지앨범 X좌표
     const [imageX, changeImageX] = useState(0);
@@ -38,7 +49,19 @@ export default function ProjectModal({projectInfo, closeModal}) {
     // 이 때 이미지앨범을 감싸는 부모 컨테이너는 overflow hidden이라 부모를 벗어난 앨범 부분은 안 보임.
     // 좌우 버튼 클릭 시 imgWidth 만큼 이미지앨범 X좌표 변경, 컴포넌트 리렌더링되면서 바뀐 x좌표로 앨범 움직임
 
-  return (
+
+    // 이미지 컨테이너 스크롤 시 화살표도 같이 움직이기(화면 중앙 유지)
+    // debounce 이용 렌더링 줄임. & useCallback(함수재사용. 큰 효과는 없지만..?)
+    const [arrowY, setArrowY] = useState(0);
+    const moveArrow = (value) => {
+        setArrowY(value); console.log(value)
+    }
+    const handleMoveArrow = useCallback(debounce(moveArrow, 200), []);
+    const handleScroll = (e) => {
+        handleMoveArrow(e.target.scrollTop);
+    }
+
+    return (
     <Background>
        <Article ref={modalRef}>
             <XContainer onClick={closeModal}>
@@ -46,15 +69,15 @@ export default function ProjectModal({projectInfo, closeModal}) {
             </XContainer>
 
             {/* 이미지 슬라이드 */}
-            <ImgContainer ref={imgWidthRef}>
+            <ImgContainer ref={imgWidthRef} onScroll={handleScroll}>
                 <ImgAlbum moveTo={imageX}>
                     {projectInfo.img.map((e,idx) => 
-                      <ProjectImg key={e+idx} src={e} alt="project image" />
+                      <ProjectImg width={imgWidth} key={e+idx} src={e} alt="project image" />
                     )}
                 
                 </ImgAlbum>
 
-                <ArrowContainer presentImgX={imageX} firstImgX={firstImgX} lastImgX={lastImgX}>
+                <ArrowContainer moveY={arrowY} presentImgX={imageX} firstImgX={firstImgX} lastImgX={lastImgX}>
                     {/* 이전 이미지 화살표(맨 처음 이미지일 때 제외) */}
                         {imageX!==firstImgX &&
                         <SizingArrowContainer onClick={()=>changeImageX(imageX+imgWidth)}>
@@ -67,28 +90,38 @@ export default function ProjectModal({projectInfo, closeModal}) {
                             <Icon color="#777" dataIcon="bx:bxs-right-arrow"></Icon>
                         </SizingArrowContainer>
                     }
-
                 </ArrowContainer>
             </ImgContainer>
 
-            <ProjectContainer>
+        {isInfo &&
+            <ProjectInfoContainer>
                 <ProjectTittle>
                     {projectInfo.tittle}
                 </ProjectTittle>
                 <ProjectDesc>
                     {projectInfo.desc}
                 </ProjectDesc>
-                <ViewButtonContainer>
-                    {[{text:"사이트 보러가기",address:projectInfo.siteAddress}
-                      ,{text:"깃허브 보러가기",address:projectInfo.githubAddress}
-                     ].map((e)=>
-                        <LinkTo key={e.text} href={e.address} target="_blank" rel="noopener noreferrer">
-                            <ViewButton>{e.text}</ViewButton>
-                        </LinkTo>
-                      )
-                    }
-                </ViewButtonContainer>
-            </ProjectContainer>
+           </ProjectInfoContainer>
+        }
+            <ViewButtonContainer>
+                {[{text:"사이트 보러가기",address:projectInfo.siteAddress}
+                    ,{text:"깃허브 보러가기",address:projectInfo.githubAddress}
+                    ].map((e)=>
+                    <LinkTo key={e.text} href={e.address} target="_blank" rel="noopener noreferrer">
+                        <ViewButton>{e.text}</ViewButton>
+                    </LinkTo>
+                    )
+                }
+            </ViewButtonContainer>
+
+            <ScrollContainer>
+                <Icon color="#777" dataIcon="iconoir:mouse-scroll-wheel"></Icon>
+            </ScrollContainer>
+
+            <PlusContainer onClick={handleInfo}>
+                <Icon color="#777" dataIcon="akar-icons:circle-plus"></Icon>
+            </PlusContainer>
+
        </Article>
     </Background>
   );
@@ -115,14 +148,17 @@ const Background = styled.div`
 
 `
 const Article = styled.article`
-    width: 70%;
+    width: 80%;
+    height: 80%;
     background-color: aqua;
 
     position: relative;
 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     @media only screen and (min-width:1024px) {
-        display: flex;
-        width: 85%;
     }
 
 `
@@ -148,9 +184,15 @@ const XContainer = styled.div`
 const ImgContainer = styled.div`
     position: relative;
     width: 100%;
-    /* height: 100%; */
+    height: 90%;
 
-    overflow: hidden; /* 보여줄 범위를 벗어난 이미지앨범 가리기 */
+    overflow-x: hidden ; 
+    overflow-y: scroll;
+
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar{ display:none; }
+    /* 내부 스크롤바 없애기 */
+
 
 
     @media only screen and (min-width:1024px) {
@@ -160,7 +202,7 @@ const ImgContainer = styled.div`
     }
 `
 const ImgAlbum = styled.div`
-    width: 100%;
+    /* width: 100%; */
     display: flex;
 
     /* 이미지앨범 좌우로 움직이기 */
@@ -169,7 +211,7 @@ const ImgAlbum = styled.div`
 `
 const ArrowContainer = styled.div`
     position: absolute;
-    top: 0;
+    top: ${props=>props.moveY}px; //px 단위 빠트리면 안 됨...
     left: 0;
     width: 100%;
     height: 100%;
@@ -182,6 +224,7 @@ const ArrowContainer = styled.div`
     align-items: center;
 `
 const SizingArrowContainer = styled.div`
+    z-index: 5;
     width: 25px;
     height: 25px;
     @media only screen and (min-width:768px) {
@@ -190,7 +233,8 @@ const SizingArrowContainer = styled.div`
     }
 `
 const ProjectImg = styled.img`
-    width: 100%;
+    width: ${props=>props.width}; //100%도 결과 같음. ImgContainer의 width인 듯
+    height: 100%; //미설정 시 height가 부모의 height에 맞추어 세로로 길게 늘려짐. 100%이면 늘려지지 않고 그대로 출력, 대신 스크롤 내리면 아래 여백 보임
 `
 const ProjectContainer = styled.div`
     /* width: 100%; */
@@ -208,6 +252,17 @@ const ProjectContainer = styled.div`
         /* height: 100%; */
     }
 `
+const ProjectInfoContainer = styled.div`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+
+    z-index:4;
+    @media only screen and (min-width:1024px) {
+        left: 100%;
+    }
+`
 const ProjectTittle = styled.h2`
 
 `
@@ -219,7 +274,6 @@ const ViewButtonContainer = styled.div`
     height: 50px;
     display: flex;
     justify-content: center;
-    
 `
 const LinkTo = styled.a`
     width: 50%;
@@ -228,4 +282,33 @@ const LinkTo = styled.a`
 const ViewButton = styled.button`
     width: 100%;
     height: 100%;
+`
+const ScrollContainer = styled.div`
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+
+    background-color: rgba(255,255,255,0.8);
+    border-radius: 50%;
+
+    z-index: 4;
+
+    width: 35px;
+    height: 35px;
+
+    @media only screen and (min-width:768px) {
+    }
+`
+const PlusContainer = styled.div`
+    position: absolute;
+    bottom: 0;
+    right: -10%;
+
+    z-index: 4;
+
+    width: 40px;
+    height: 40px;
+
+    @media only screen and (min-width:768px) {
+    }
 `

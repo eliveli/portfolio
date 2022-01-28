@@ -15,7 +15,6 @@ export default function useModal() {
         return;
       }
       handleShowOn(!isShowOn); // 모달 on 일 때 show off
-
     }
   
     // 모달on, show off 이후 모달 off.
@@ -26,9 +25,6 @@ export default function useModal() {
       }
 
     }, [isShowOn]);
-
-
-
 
   return {isModal, handleModal, isShowOn};
 }
