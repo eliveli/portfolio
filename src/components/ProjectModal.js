@@ -84,7 +84,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
     const [isUp, handleUp] = useState(false);
     const [isDown, handleDown] = useState(true);
     
-    // y스크롤 시 컨테이너가 스크롤 따라가기. 화살표 컨테이너에 적용
+    // y스크롤 시 컨테이너가 스크롤 따라가기. 화살표 컨테이너, info 컨테이너에 적용
     const [followY, setFollowY] = useState(0);
     
     const imgElement = () => imgRef.current[imgIndex]; //현재 이미지 element // 유의 : current는 처음에는 undefined. 그래서 변수에 값을 바로 담을 수 없음. 여기에서는 함수 리턴으로 담음. 함수 호출 시 값을 찾음.
@@ -94,7 +94,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
     const setScrollY = ({top}) => {
         const moveY = imgElement()?.offsetHeight - imgContainerElement()?.offsetHeight; // 이동할 Y 값: (이미지 세로) - (이미지컨테이너 세로) // 계산 없이 이미지 세로만큼 이동하면 이미지 끝이 화면 최상단에 옴.
 
-        setFollowY(top); //arrow 컨테이너 top 값 변경 : y스크롤 따라 이동(화면 중앙 유지)
+        setFollowY(top); //arrow 컨테이너, info 컨테이너 top 값 변경 : y스크롤 따라 이동(화면 중앙 유지)
 
         if (top > 10) handleUp(true); // scroll Up 아이콘 표시여부 결정
         else handleUp(false);
@@ -183,7 +183,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
 
 
                 {isInfo &&
-                <ProjectInfoContainer>
+                <ProjectInfoContainer moveY={followY}>
                     <ProjectTittle>
                         {projectInfo.tittle}
                     </ProjectTittle>
@@ -375,7 +375,7 @@ const ProjectContainer = styled.div`
 `
 const ProjectInfoContainer = styled.div`
     position: absolute;
-    top: 0;
+    top: ${props=>props.moveY}px; //미적용 시 이미지 컨테이너에서 스크롤을 내릴 때 info컨테이너가 화면에 보이지 않음
     left: 0;
     width: 100%;
     height: 100%;
