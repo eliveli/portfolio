@@ -38,7 +38,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
     const imgWidth = useComponentWidth(imgContainer); //이미지width 가져오기
 
 
-    // 디바이스별 이미지
+    // 디바이스별 이미지 분리 열람
     const {mobile, tablet, desktop} = projectInfo.img;
     const device = [mobile, tablet, desktop]; //배열에 담아 인덱스로 접근(for <DeviceContainer> 컴포넌트)
     const [deviceImg, setDeviceImg] = useState(mobile);
@@ -51,19 +51,15 @@ export default function ProjectModal({projectInfo, closeModal}) {
     }
 
 
+
+    
     // 현재 이미지앨범 X좌표
     const [imageX, changeImageX] = useState(0);
 
     // 처음&마지막 이미지 X좌표 (좌우 화살표 표시 여부 결정)
     const firstImgX = 0;
     const lastImgX = -imgWidth*(deviceImg.length-1);
-
-    // 이미지 슬라이드 기능 //
-    // 이미지 앨범 안에 이미지 요소를 여럿 넣고 이미지앨범을 x축 방향으로 좌우 이동.
-    // 이 때 이미지앨범을 감싸는 부모 컨테이너는 overflow hidden이라 부모를 벗어난 앨범 부분은 안 보임.
-    // 좌우 버튼 클릭 시 imgWidth 만큼 이미지앨범 X좌표 변경, 컴포넌트 리렌더링되면서 바뀐 x좌표로 앨범 움직임
-
-
+    
     // 이미지 컨테이너 스크롤 시 화살표도 같이 움직이기(화면 중앙 유지)
     // debounce 이용 렌더링 줄임. & useCallback(함수재사용. 큰 효과는 없지만..?)
     const [arrowY, setArrowY] = useState(0);
@@ -74,11 +70,22 @@ export default function ProjectModal({projectInfo, closeModal}) {
     const handleScroll = (e) => {
         handleMoveArrow(e.target.scrollTop);
     }
+    
+    
 
 
+    // 좌우 화살표 클릭 시 이미지 x 좌표 변경 
+    const changeImg = (x) => {
+        changeImageX(x);
+        setTimeout(()=>imgContainer.current.scrollTo({top:0,left:0,behavior:'smooth'}),100); //스크롤 맨 처음으로 이동. smooth : 이미지앨범의 transition에 의해 이미지 좌우로 이동하면서 화면전환 부드럽게.
+    }
+    
 
-
-        
+    // 이미지 슬라이드 기능 //
+    // 이미지 앨범 안에 이미지 요소를 여럿 넣고 이미지앨범을 x축 방향으로 좌우 이동.
+    // 이 때 이미지앨범을 감싸는 부모 컨테이너는 overflow hidden이라 부모를 벗어난 앨범 부분은 안 보임.
+    // 좌우 버튼 클릭 시 imgWidth 만큼 이미지앨범 X좌표 변경, 컴포넌트 리렌더링되면서 바뀐 x좌표로 앨범 움직임
+    
     return (
     <Background>
        <Article ref={modalRef}>
@@ -109,13 +116,13 @@ export default function ProjectModal({projectInfo, closeModal}) {
                 <ArrowContainer moveY={arrowY} presentImgX={imageX} firstImgX={firstImgX} lastImgX={lastImgX}>
                     {/* 이전 이미지 화살표(맨 처음 이미지일 때 제외) */}
                         {imageX!==firstImgX &&
-                        <SizingArrowContainer onClick={()=>changeImageX(imageX+imgWidth)}>
+                        <SizingArrowContainer onClick={()=>changeImg(imageX+imgWidth)}>
                             <Icon color="#777" dataIcon="bx:bxs-left-arrow"></Icon>
                         </SizingArrowContainer>
                     }
                     {/* 다음 이미지 화살표(맨 끝 이미지일 때 제외) */}
                         {imageX!==lastImgX && 
-                        <SizingArrowContainer onClick={()=>changeImageX(imageX-imgWidth)}>
+                        <SizingArrowContainer onClick={()=>changeImg(imageX-imgWidth)}>
                             <Icon color="#777" dataIcon="bx:bxs-right-arrow"></Icon>
                         </SizingArrowContainer>
                     }
@@ -252,7 +259,7 @@ const ImgAlbum = styled.div`
 
     /* 이미지앨범 좌우로 움직이기 */
     transition-duration:0.5s;
-    ${(props)=>`transform:translateX(${props.moveTo}px);`}
+    ${(props)=>`transform:translate(${props.moveTo}px, 0);`}
 `
 const ArrowContainer = styled.div`
     position: absolute;
