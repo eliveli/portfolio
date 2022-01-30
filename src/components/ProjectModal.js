@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Icon } from './elements';
 import useModal from '../hooks/useModal';
 import useComponentWidth from '../hooks/useComponentWidth';
+import useComponentHeight from "../hooks/useComponentHeight"
 import {debounce} from "lodash";
 export default function ProjectModal({projectInfo, closeModal}) {
 
@@ -35,12 +36,17 @@ export default function ProjectModal({projectInfo, closeModal}) {
     const isInfoShow = isShowOn;
     
     
+    // article 컨테이너의 height 값 가져오기 //화살표아이콘 세로 정렬하는 데 활용
+    const articleContainer = useRef();
+    const articleHeight = useComponentHeight(articleContainer); //이미지width 가져오기
+
 
     // 이미지 컨테이너의 width 값 가져오기 //
     // (~.current는 undefined라 useEffect 이용, 렌더링 이후 state 설정)
     // (state로 설정해 렌더링 이후에도 값 유지)
     const imgContainer = useRef();
     const imgWidth = useComponentWidth(imgContainer); //이미지width 가져오기
+
 
     // 디바이스별 이미지 분리 열람-----------------------//
     const {mobile, tablet, desktop} = projectInfo.img;
@@ -84,7 +90,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
     const [isUp, handleUp] = useState(false);
     const [isDown, handleDown] = useState(true);
     
-    // y스크롤 시 컨테이너가 스크롤 따라가기. 화살표 컨테이너, info 컨테이너에 적용
+    // y스크롤 시 컨테이너가 스크롤 따라가기. info 컨테이너에 적용
     const [followY, setFollowY] = useState(0);
     
     const imgElement = () => imgRef.current[imgIndex]; //현재 이미지 element // 유의 : current는 처음에는 undefined. 그래서 변수에 값을 바로 담을 수 없음. 여기에서는 함수 리턴으로 담음. 함수 호출 시 값을 찾음.
@@ -94,7 +100,7 @@ export default function ProjectModal({projectInfo, closeModal}) {
     const setScrollY = ({top}) => {
         const moveY = imgElement()?.offsetHeight - imgContainerElement()?.offsetHeight; // 이동할 Y 값: (이미지 세로) - (이미지컨테이너 세로) // 계산 없이 이미지 세로만큼 이동하면 이미지 끝이 화면 최상단에 옴.
 
-        setFollowY(top); //arrow 컨테이너, info 컨테이너 top 값 변경 : y스크롤 따라 이동(화면 중앙 유지)
+        setFollowY(top); //info 컨테이너 top 값 변경 : y스크롤 따라 이동(화면 중앙 유지)
 
         if (top > 10) handleUp(true); // scroll Up 아이콘 표시여부 결정
         else handleUp(false);
@@ -140,21 +146,21 @@ export default function ProjectModal({projectInfo, closeModal}) {
     //-------------------------------------------------------------------------//
 
     return (
-    <Background>
-       <Article>
+       <Article ref={articleContainer}>
             <TopContainer>
-                <div>
-                {["gridicons:phone","gridicons:tablet","fa-solid:desktop"]
-                .map((dataIcon,idx)=>
-                    <DeviceContainer onClick={()=>handleDevice(idx)} key={dataIcon}>
-                        <Icon color="#777" dataIcon={dataIcon}></Icon>
-                    </DeviceContainer>
-                )}
-                </div>
-                
-                <XContainer onClick={closeModal}>
-                    <Icon color="#777" dataIcon="gg:close"></Icon>
-                </XContainer>
+                <TopWidthContainer imgWidth={imgWidth}>
+                    <TopLeftIconContainer>
+                        {["gridicons:phone","gridicons:tablet","fa-solid:desktop"]
+                        .map((dataIcon,idx)=>
+                            <TopIconContainer onClick={()=>handleDevice(idx)} key={dataIcon}>
+                                <Icon color="#777" dataIcon={dataIcon}></Icon>
+                            </TopIconContainer>
+                        )}
+                    </TopLeftIconContainer>
+                    <TopIconContainer onClick={closeModal}>
+                        <Icon color="#777" dataIcon="gg:close"></Icon>
+                    </TopIconContainer>
+                </TopWidthContainer>
             </TopContainer>
 
             {/* 이미지 슬라이드 */}
@@ -166,20 +172,6 @@ export default function ProjectModal({projectInfo, closeModal}) {
                 
                 </ImgAlbum>
 
-                <ArrowContainer moveY={followY} presentImgX={imageX} firstImgX={firstImgX} lastImgX={lastImgX}>
-                    {/* 이전 이미지 화살표(맨 처음 이미지일 때 제외) */}
-                        {imageX!==firstImgX &&
-                        <SizingArrowContainer onClick={()=>changeImg(imageX+imgWidth)}>
-                            <Icon color="#777" dataIcon="bx:bxs-left-arrow"></Icon>
-                        </SizingArrowContainer>
-                    }
-                    {/* 다음 이미지 화살표(맨 끝 이미지일 때 제외) */}
-                        {imageX!==lastImgX && 
-                        <SizingArrowContainer onClick={()=>changeImg(imageX-imgWidth)}>
-                            <Icon color="#777" dataIcon="bx:bxs-right-arrow"></Icon>
-                        </SizingArrowContainer>
-                    }
-                </ArrowContainer>
 
 
                 {isInfo &&
@@ -194,24 +186,27 @@ export default function ProjectModal({projectInfo, closeModal}) {
                 }
             </ImgContainer>
 
-            <ViewButtonContainer>
-                {[{text:"사이트 보러가기",address:projectInfo.siteAddress}
-                    ,{text:"깃허브 보러가기",address:projectInfo.githubAddress}
-                    ].map((e)=>
-                    <LinkTo key={e.text} href={e.address} target="_blank" rel="noopener noreferrer">
-                        <ViewButton>{e.text}</ViewButton>
-                    </LinkTo>
-                    )
-                }
-            </ViewButtonContainer>
+            
+            {/* 이전 이미지 화살표(맨 처음 이미지일 때 제외) */}
+            { (imageX!==firstImgX && !isInfo) &&
+            <SizingArrowContainer screenWidth={window.screen.availWidth} articleHeight={articleHeight} imgWidth={imgWidth} left={true} onClick={()=>changeImg(imageX+imgWidth)}>
+                <Icon color="#555" dataIcon="bx:bxs-left-arrow"></Icon>
+            </SizingArrowContainer>
+            }
+            {/* 다음 이미지 화살표(맨 끝 이미지일 때 제외) */}
+            { (imageX!==lastImgX && !isInfo) &&
+                <SizingArrowContainer screenWidth={window.screen.availWidth} articleHeight={articleHeight} imgWidth={imgWidth} onClick={()=>changeImg(imageX-imgWidth)}>
+                    <Icon color="#555" dataIcon="bx:bxs-right-arrow"></Icon>
+                </SizingArrowContainer>
+            }
 
 
-            <PaperContainer onClick={handleInfo}>
+            <PaperContainer screenWidth={window.screen.availWidth} imgWidth={imgWidth} onClick={handleInfo}>
                 <Icon color="#777" dataIcon="ph:scroll-duotone"></Icon>
             </PaperContainer>
 
-
-            <ScrollSetContainer>
+            {!isInfo && 
+            <ScrollSetContainer screenWidth={window.screen.availWidth} imgWidth={imgWidth}>
                 {isUp && 
                 <ScrollContainer onClick={handleScrollUp}>
                     <Icon color="#777" dataIcon="line-md:chevron-double-up"></Icon>
@@ -223,10 +218,21 @@ export default function ProjectModal({projectInfo, closeModal}) {
                 </ScrollContainer>
                 }
             </ScrollSetContainer>
+            }
+
+            <ViewButtonContainer>
+                {[{text:"사이트 보러가기",address:projectInfo.siteAddress}
+                    ,{text:"깃허브 보러가기",address:projectInfo.githubAddress}
+                    ].map((e,idx)=>
+                    <LinkTo key={e.text} href={e.address} target="_blank" rel="noopener noreferrer">
+                        <ViewButton left={idx}>{e.text}</ViewButton>
+                    </LinkTo>
+                    )
+                }
+            </ViewButtonContainer>
 
 
        </Article>
-    </Background>
   );
 }
 
@@ -236,26 +242,16 @@ ProjectModal.defaultProps = {
     closeModal: ()=>{},
 }
 
-const Background = styled.div`
+
+const Article = styled.article`
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255,255,255,0.5);
+    background-color: rgba(0,0,0,0.8);
+
     z-index: 2;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-`
-const Article = styled.article`
-    width: 100%;
-    height: 100%;
-    background-color: aqua;
-
-    position: relative;
 
     display: flex;
     flex-direction: column;
@@ -266,42 +262,48 @@ const Article = styled.article`
 
 `
 const TopContainer = styled.div`
+    width:100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: rgba(0,0,0,0.5);
+
+    padding: 1px;
+    @media only screen and (min-width:1024px) {
+    }
+`
+const TopWidthContainer = styled.div`
     display: flex;
     justify-content: space-between;
+    align-items: center;
+
+    width:${props=>props.imgWidth - 2}px; //빠트리면 하위 아이템들 정렬이 제대로 안 됨
 `
-const DeviceContainer = styled.div`
+const TopLeftIconContainer = styled.div`
+    display: flex;
+    align-items:center;
+    gap:1px;
+`
+const TopIconContainer = styled.div`
     display: inline-block;
 
-    width: 25px;
-    height: 25px;
-    background-color: rgba(255,255,255,0.5);
-    border: 2px solid #777;
+    width: 27px;
+    height: 27px;
+    background-color: rgba(255,255,255,1);
+    border: 2px solid #ddd;
     border-radius: 20%;
     
     @media only screen and (min-width:768px) {
-        width: 40px;
-        height: 40px;
-    }
-`
-const XContainer = styled.div`
-    z-index: 4;
-
-    width: 25px;
-    height: 25px;
-    background-color: rgba(255,255,255,0.5);
-    border: 2px solid #777;
-    border-radius: 20%;
-
-    @media only screen and (min-width:768px) {
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
     }
 `
 
 const ImgContainer = styled.div`
     position: relative;
     width: 100%;
-    height: 90%;
+    height: 100%;
 
     overflow-x: hidden ; 
     overflow-y: ${props=>props.isOpenedInfo? "hidden":"scroll"}; //info 모달 창 열리면 이미지컨테이너 스크롤 막기
@@ -311,7 +313,7 @@ const ImgContainer = styled.div`
     /* 내부 스크롤바 없애기 */
 
     @media only screen and (min-width:1024px) {
-        width:60%;
+        width:50%;
         /* height: 50%; */
 
     }
@@ -330,49 +332,43 @@ const ImgAlbum = styled.div`
     /* ${(props)=>props.moveY? `transform:translate(${props.moveX}px,-${props.moveY}px);` :""} */
 `
 
-const ArrowContainer = styled.div`
-    position: absolute;
-    top: ${props=>props.moveY}px; //px 단위 빠트리면 안 됨...
-    left: 0;
-    width: 100%;
-    height: 100%;
 
-    z-index: 3;
-
-    display: flex;
-    /* 현재 이미지의 위치에 따른 좌우 화살표 표시 여부에 따라 화살표 정렬 변경 */
-    justify-content: ${(props)=>props.presentImgX===props.firstImgX? "right" : props.presentImgX===props.lastImgX? "left" : "space-between"};
-    align-items: center;
-`
 const SizingArrowContainer = styled.div`
-    width: 25px;
-    height: 25px;
+    background-color: rgba(255,255,255,0.9);
+    border-radius: 10%;
+    border: 2px solid rgba(0,0,0,0.1);
+
+    width: 32px; //padding, border 포함 시 전체 가로 길이는 40px
+    height: 32px;
     
+    padding:${props=>props.left? "2px 3px 2px 1px" : "2px 1px 2px 3px"};
+    /* padding 좌우 다르게 줘서 내부에 넣는 아이콘 간격 맞추기. 이유 : 받아오는 아이콘의 패딩이 일정하지 않음 */
+    /* + 왼쪽 오른쪽 화살표 구분에 따라서도 패딩 다르게 주기 */
+
+    position: absolute;
+    top: ${props=>(props.articleHeight - 50 - 42 + 27 )/2 - (40/2)}px;
+    
+    left: ${props=>props.left? "0px" : "" };
+    right: ${props=>props.left? "" : "0px"};
+
+
     @media only screen and (min-width:768px) {
-        width: 40px;
-        height: 40px;
+        width: 42px; //padding, border 포함 시 전체 가로 50px
+        height: 42px;
+
+        top: ${props=>(props.articleHeight - 50 - 42 + 27 )/2 - (50/2)}px;
+    }
+    @media only screen and (min-width:1024px) {
+        left: ${props=>props.left? `${(props.screenWidth - props.imgWidth)/2 - 50 - 0}px`:""};
+        right: ${props=>props.left? "" : `${(props.screenWidth - props.imgWidth)/2 - 50 - 0}px`};
     }
 `
+
 const ProjectImg = styled.img`
     width: ${props=>props.width}; //100%도 결과 같음. ImgContainer의 width인 듯
     height: 100%; //미설정 시 height가 부모의 height에 맞추어 세로로 길게 늘려짐. 100%이면 늘려지지 않고 그대로 출력, 대신 스크롤 내리면 아래 여백 보임
 `
-const ProjectContainer = styled.div`
-    /* width: 100%; */
-    padding: 10px;
-    /* width padding 중복 적용 시. width 밖으로 추가 padding 적용되어 화면 밖으로 콘텐츠가 벗어남. */
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    @media only screen and (min-width:1024px) {
-        width:40%;
-        /* padding: 20px; */
-
-        /* height: 100%; */
-    }
-`
 const ProjectInfoContainer = styled.div`
     position: absolute;
     top: ${props=>props.moveY}px; //미적용 시 이미지 컨테이너에서 스크롤을 내릴 때 info컨테이너가 화면에 보이지 않음
@@ -380,9 +376,10 @@ const ProjectInfoContainer = styled.div`
     width: 100%;
     height: 100%;
 
-    z-index:4;
-
     background-color: rgba(255,255,255,0.9);
+
+    box-sizing: border-box;
+    padding: 20px 40px;
     @media only screen and (min-width:1024px) {
         /* left: 100%; */
     }
@@ -398,6 +395,7 @@ const ViewButtonContainer = styled.div`
     height: 50px;
     display: flex;
     justify-content: center;
+
 `
 const LinkTo = styled.a`
     width: 50%;
@@ -405,41 +403,60 @@ const LinkTo = styled.a`
 `
 const ViewButton = styled.button`
     width: 100%;
-    height: 100%;
-`
+    height: 50px;
 
-const ScrollSetContainer = styled.div`
-    display: flex;
-    flex-direction: column;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
 
-    position: absolute;
-    bottom: 60px;
-    right: 0;
-    z-index: 3;
-`
-const ScrollContainer = styled.div`
-    background-color: rgba(255,255,255,0.8);
-    border-radius: 50%;
+    font-size: 16px;
 
-    width: 40px;
-    height: 40px;
+    border: 0;
+    border-left: ${props=>props.left===1? "0.5px solid rgba(255,255,255,0.3)" : ""};
 
-    @media only screen and (min-width:768px) {
-    }
 `
 const PaperContainer = styled.div`
     position: absolute;
-    bottom: 60px;
-    left: 0;
+    bottom: ${50+3}px;
+    left: ${0+3}px;
 
-    background-color: rgba(255,255,255,0.8);
+    background-color: rgba(255,255,255,0.9);
     border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
 
     z-index: 4;
+
+    width: 40px; //border 포함 전체 가로 42
+    height: 40px;
+
+    @media only screen and (min-width:1024px) {
+        left: ${props=>(props.screenWidth - props.imgWidth)/2 - (40+2) - 3}px;
+        bottom: ${50+3}px;
+
+    }
+`
+const ScrollSetContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    
+    position: absolute;
+    right: ${0+3}px;
+    bottom: ${50+3}px;
+    gap: 3px;
+
+    z-index: 3;
+    @media only screen and (min-width:1024px) {
+        right: ${props=>(props.screenWidth - props.imgWidth)/2 - (40+2) - 3}px;
+        bottom: ${50+3}px;
+        gap: 3px;
+    }
+`
+const ScrollContainer = styled.div`
+    background-color: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
 
     width: 40px;
     height: 40px;
 
-    @media only screen and (min-width:768px) {
-    }
+
 `
