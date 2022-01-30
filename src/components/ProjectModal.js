@@ -36,9 +36,10 @@ export default function ProjectModal({projectInfo, closeModal}) {
     const isInfoShow = isShowOn;
     
     
-    // article 컨테이너의 height 값 가져오기 //화살표아이콘 세로 정렬하는 데 활용
+    // article 컨테이너의 width, height 값 가져오기 //여러 아이콘 정렬에 활용 //window.screen.availWidth 제대로 적용 안 됨. 스크린 사이즈가 아니라 컴포넌트 사이즈를 가져오자
     const articleContainer = useRef();
-    const articleHeight = useComponentHeight(articleContainer); //이미지width 가져오기
+    const articleWidth = useComponentWidth(articleContainer);
+    const articleHeight = useComponentHeight(articleContainer);
 
 
     // 이미지 컨테이너의 width 값 가져오기 //
@@ -189,24 +190,24 @@ export default function ProjectModal({projectInfo, closeModal}) {
             
             {/* 이전 이미지 화살표(맨 처음 이미지일 때 제외) */}
             { (imageX!==firstImgX && !isInfo) &&
-            <SizingArrowContainer screenWidth={window.screen.availWidth} articleHeight={articleHeight} imgWidth={imgWidth} left={true} onClick={()=>changeImg(imageX+imgWidth)}>
+            <SizingArrowContainer articleWidth={articleWidth} articleHeight={articleHeight} imgWidth={imgWidth} left={true} onClick={()=>changeImg(imageX+imgWidth)}>
                 <Icon color="#555" dataIcon="bx:bxs-left-arrow"></Icon>
             </SizingArrowContainer>
             }
             {/* 다음 이미지 화살표(맨 끝 이미지일 때 제외) */}
             { (imageX!==lastImgX && !isInfo) &&
-            <SizingArrowContainer screenWidth={window.screen.availWidth} articleHeight={articleHeight} imgWidth={imgWidth} onClick={()=>changeImg(imageX-imgWidth)}>
+            <SizingArrowContainer articleWidth={articleWidth} articleHeight={articleHeight} imgWidth={imgWidth} onClick={()=>changeImg(imageX-imgWidth)}>
                 <Icon color="#555" dataIcon="bx:bxs-right-arrow"></Icon>
             </SizingArrowContainer>
             }
 
 
-            <PaperContainer screenWidth={window.screen.availWidth} imgWidth={imgWidth} onClick={handleInfo}>
+            <PaperContainer articleWidth={articleWidth} imgWidth={imgWidth} onClick={handleInfo}>
                 <Icon color="#777" dataIcon="ph:scroll-duotone"></Icon>
             </PaperContainer>
 
             {!isInfo && 
-            <ScrollSetContainer screenWidth={window.screen.availWidth} imgWidth={imgWidth}>
+            <ScrollSetContainer articleWidth={articleWidth} imgWidth={imgWidth}>
                 {isUp && 
                 <ScrollContainer onClick={handleScrollUp}>
                     <Icon color="#777" dataIcon="line-md:chevron-double-up"></Icon>
@@ -364,8 +365,8 @@ const SizingArrowContainer = styled.div`
         top: ${props=>(props.articleHeight - 50 - 42 + 27 )/2 - (50/2)}px;
     }
     @media only screen and (min-width:1024px) {
-        left: ${props=>props.left? `${(props.screenWidth - props.imgWidth)/2 - 50 - 0}px`:""};
-        right: ${props=>props.left? "" : `${(props.screenWidth - props.imgWidth)/2 - 50 - 0}px`};
+        left: ${props=>props.left? `${(props.articleWidth - props.imgWidth)/2 - 50 - 0}px`:""};
+        right: ${props=>props.left? "" : `${(props.articleWidth - props.imgWidth)/2 - 50 - 0}px`};
     }
 
     &:hover{
@@ -443,7 +444,7 @@ const PaperContainer = styled.div`
     height: 40px;
 
     @media only screen and (min-width:1024px) {
-        left: ${props=>(props.screenWidth - props.imgWidth)/2 - (40+2) - 3}px;
+        left: ${props=>(props.articleWidth - props.imgWidth)/2 - (40+2) - 3}px;
         bottom: ${50+3}px;
 
     }
@@ -464,7 +465,7 @@ const ScrollSetContainer = styled.div`
 
     z-index: 3;
     @media only screen and (min-width:1024px) {
-        right: ${props=>(props.screenWidth - props.imgWidth)/2 - (40+2) - 3}px;
+        right: ${props=>(props.articleWidth - props.imgWidth)/2 - (40+2) - 3}px;
         bottom: ${50+3}px;
         gap: 3px;
     }
