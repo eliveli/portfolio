@@ -25,13 +25,14 @@ const Projects = () => {
       <Text>My projects are ...</Text>
       <ImgContainer>
         {Array.from({length:4}, (e, index) => 
-          <img key={`ProjectImg${index}`} width="100%" src={projectImgs[index]} alt="projectImg" onClick={projectModals[index].handleModal}/>
+        
+          <Img key={`ProjectImg${index}`} width="100%" src={projectImgs[index]} alt="projectImg" onClick={projectModals[index].handleModal}/>
         )}
 
         {/* 활성화되는 모달 */}
         {trueModalIndex !== -1 && 
-          <ProjectModal projectInfo={projectInfo[trueModalIndex]}
-              closeModal={projectModals[trueModalIndex].handleModal} />
+        <ProjectModal projectInfo={projectInfo[trueModalIndex]}
+            closeModal={projectModals[trueModalIndex].handleModal} />
         }
       </ImgContainer>
   </Section>
@@ -58,4 +59,11 @@ const ImgContainer = styled.div`
     @media only screen and (max-width: 760px) {
         grid-template-columns: 1fr;
     }
+`
+
+const Img = styled.img`
+  &:hover{
+    cursor: pointer;
+    opacity: 0.5;
+  }
 `

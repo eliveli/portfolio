@@ -195,9 +195,9 @@ export default function ProjectModal({projectInfo, closeModal}) {
             }
             {/* 다음 이미지 화살표(맨 끝 이미지일 때 제외) */}
             { (imageX!==lastImgX && !isInfo) &&
-                <SizingArrowContainer screenWidth={window.screen.availWidth} articleHeight={articleHeight} imgWidth={imgWidth} onClick={()=>changeImg(imageX-imgWidth)}>
-                    <Icon color="#555" dataIcon="bx:bxs-right-arrow"></Icon>
-                </SizingArrowContainer>
+            <SizingArrowContainer screenWidth={window.screen.availWidth} articleHeight={articleHeight} imgWidth={imgWidth} onClick={()=>changeImg(imageX-imgWidth)}>
+                <Icon color="#555" dataIcon="bx:bxs-right-arrow"></Icon>
+            </SizingArrowContainer>
             }
 
 
@@ -298,6 +298,11 @@ const TopIconContainer = styled.div`
         width: 35px;
         height: 35px;
     }
+
+    &:hover{
+    cursor: pointer;
+    opacity: 0.5;
+  }
 `
 
 const ImgContainer = styled.div`
@@ -362,6 +367,11 @@ const SizingArrowContainer = styled.div`
         left: ${props=>props.left? `${(props.screenWidth - props.imgWidth)/2 - 50 - 0}px`:""};
         right: ${props=>props.left? "" : `${(props.screenWidth - props.imgWidth)/2 - 50 - 0}px`};
     }
+
+    &:hover{
+    cursor: pointer;
+    opacity: 0.5;
+  }
 `
 
 const ProjectImg = styled.img`
@@ -413,6 +423,10 @@ const ViewButton = styled.button`
     border: 0;
     border-left: ${props=>props.left===1? "0.5px solid rgba(255,255,255,0.3)" : ""};
 
+    &:hover{
+    cursor: pointer;
+    opacity: 0.5;
+  }
 `
 const PaperContainer = styled.div`
     position: absolute;
@@ -433,6 +447,11 @@ const PaperContainer = styled.div`
         bottom: ${50+3}px;
 
     }
+
+    &:hover{
+    cursor: pointer;
+    opacity: 0.5;
+  }
 `
 const ScrollSetContainer = styled.div`
     display: flex;
@@ -458,5 +477,8 @@ const ScrollContainer = styled.div`
     width: 40px;
     height: 40px;
 
-
+    &:hover{
+    cursor: pointer;
+    opacity: 0.5;
+    }
 `

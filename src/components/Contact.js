@@ -20,9 +20,9 @@ export default function Contact() {
             
             {/* 깃허브 링크 */}
             go to 
-            <a href="https://github.com/eliveli" target="_blank" rel="noopener noreferrer">
+            <A href="https://github.com/eliveli" target="_blank" rel="noopener noreferrer">
                 <GithubIcon className="iconify" data-icon="uiw:github"></GithubIcon>
-            </a>
+            </A>
 
             {/* 플랫폼별 연락처 */}
             <ContactInfoContainer>
@@ -41,6 +41,12 @@ const Section = styled.section`
 
     width: 100%;
     /* 상위 element부터 width 설정해야 하위 element에 width % 로 설정 가능. */
+`
+const A = styled.a`
+  &:hover{
+    cursor: pointer;
+    opacity: 0.5;
+  }
 `
 const GithubIcon = styled.span`
     width: 50px;
@@ -96,6 +102,11 @@ const SkillItemContainer = styled.div`
     /* 상위 element(flex container)에 대해 flex item으로써 width 설정 */
     /* width %로 적용 시 부모에 대한 비율/형제와의 간격을 고려 */
     /* (유의) width 100%를 넣으면 상위 element에 주었던 justify content 정렬이 안 먹힘 */
+
+    &:hover{
+    cursor: pointer;
+    opacity: 0.5;
+  }
 `
 
 // 아이콘 클릭 시 보여줄 정보
