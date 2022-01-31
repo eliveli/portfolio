@@ -11,7 +11,7 @@ function App() {
   function scrollTo(index) {
     sectionRef.current[index].current.scrollIntoView({ behavior: 'smooth' })
   }
-
+  
   return (
     <>
       <Navbar handleScrollTo={scrollTo} />

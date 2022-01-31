@@ -32,7 +32,8 @@ const Projects = () => {
         {/* 활성화되는 모달 */}
         {trueModalIndex !== -1 && 
         <ProjectModal projectInfo={projectInfo[trueModalIndex]}
-            closeModal={projectModals[trueModalIndex].handleModal} />
+            closeModal={projectModals[trueModalIndex].handleModal}
+            isProjectModal={projectModals[trueModalIndex].isModal} />
         }
       </ImgContainer>
   </Section>

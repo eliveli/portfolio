@@ -2,17 +2,12 @@ import {useState, useEffect} from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Icon } from './elements';
 import useModal from '../hooks/useModal';
+import usePreventScroll from "../hooks/usePreventScroll"
 export default function Navbar({handleScrollTo}) {
   const {isModal, handleModal, isShowOn} = useModal();
 
-  // 모달 띄운 동안 body 영역 스크롤 막기
-  useEffect(()=>{
-    if(isModal){ //모바일 뷰 모달 적용
-    document.body.style.overflow = "hidden";
-    return () => {document.body.style.overflow="unset";}
-    }
-  }, [isModal]);
-
+  usePreventScroll(isModal); // 모달 띄운 동안 body 영역 스크롤 막기
+  
   return (
     <NavBar>
         {/* 모바일용 햄버거 버튼. 클릭 on off 구분 */}

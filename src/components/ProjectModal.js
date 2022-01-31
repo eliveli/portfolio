@@ -2,10 +2,11 @@ import {useState, useRef, useEffect, createRef, useCallback} from 'react';
 import styled from 'styled-components';
 import { Icon } from './elements';
 import useModal from '../hooks/useModal';
+import usePreventScroll from "../hooks/usePreventScroll"
 import useComponentWidth from '../hooks/useComponentWidth';
 import useComponentHeight from "../hooks/useComponentHeight"
 import {debounce} from "lodash";
-export default function ProjectModal({projectInfo, closeModal}) {
+export default function ProjectModal({projectInfo, closeModal, isProjectModal}) {
 
     // 취소 이유: 모달 전체화면으로 변경
     // 모달 바깥 영역 클릭 시 모달 닫기. show off & modal off------//
@@ -21,13 +22,8 @@ export default function ProjectModal({projectInfo, closeModal}) {
     // }, []);
     //----------------------------------------------------------//
 
-    
-    // 모달 띄운 동안 body 영역 스크롤 막기
-    useEffect(()=>{
-        document.body.style.overflow = "hidden";
-        return () => {document.body.style.overflow="unset";}
-    }, [])
 
+    usePreventScroll(isProjectModal); // 모달 띄운 동안 body 영역 스크롤 막기
 
     // 프로젝트 info 모달(paper버튼 클릭 시)
     const { isModal, handleModal, isShowOn} = useModal();
