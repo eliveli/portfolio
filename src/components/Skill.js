@@ -2,7 +2,7 @@ import React from 'react';
 import {Text,Icon} from './elements';
 import styled from "styled-components";
 
-export default function Skill() {
+function Skill() {
 
     // props to SkillItem component
     const propsDataIcon = ["fontisto:html5","simple-icons:css3","teenyicons:javascript-outline","akar-icons:react-fill","file-icons:typescript","grommet-icons:node"];
@@ -19,6 +19,8 @@ export default function Skill() {
             </SkillContainer>
         </Section>);
 }
+
+export default React.memo(Skill);
 
 const Section = styled.section`
     display: flex;

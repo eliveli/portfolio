@@ -4,7 +4,7 @@ import useModal from '../hooks/useModal';
 import styled from "styled-components";
 
 
-export default function Contact() {
+function Contact() {
 
    // 플랫폼별 연락처 보여줄 모달 설정 함수 모음
   const contactModals = [useModal(),useModal(),useModal()];
@@ -32,6 +32,8 @@ export default function Contact() {
             </ContactInfoContainer>
         </Section>);
       }
+
+export default React.memo(Contact);
 
 const Section = styled.section`
     display: flex;

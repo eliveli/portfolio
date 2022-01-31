@@ -40,7 +40,7 @@ const Projects = () => {
   )
   };
 
-export default Projects;
+export default React.memo(Projects);
 
 const Section = styled.section`
     display: flex;
