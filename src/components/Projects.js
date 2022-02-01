@@ -33,7 +33,8 @@ const Projects = () => {
         {trueModalIndex !== -1 && 
         <ProjectModal projectInfo={projectInfo[trueModalIndex]}
             closeModal={projectModals[trueModalIndex].handleModal}
-            isProjectModal={projectModals[trueModalIndex].isModal} />
+            isProjectModal={projectModals[trueModalIndex].isModal}
+            isProjectShow={projectModals[trueModalIndex].isShowModal} />
         }
       </ImgContainer>
   </Section>
@@ -63,8 +64,10 @@ const ImgContainer = styled.div`
 `
 
 const Img = styled.img`
-  &:hover{
+  @media (hover: hover) {
+    &:hover {
     cursor: pointer;
     opacity: 0.5;
+    }
   }
 `

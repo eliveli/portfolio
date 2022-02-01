@@ -1,12 +1,14 @@
 import {useState, useRef, useEffect, createRef, useCallback} from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Icon } from './elements';
 import useModal from '../hooks/useModal';
 import usePreventScroll from "../hooks/usePreventScroll"
 import useComponentWidth from '../hooks/useComponentWidth';
 import useComponentHeight from "../hooks/useComponentHeight"
 import {debounce} from "lodash";
-export default function ProjectModal({projectInfo, closeModal, isProjectModal}) {
+
+
+export default function ProjectModal({projectInfo, closeModal, isProjectModal, isProjectShow}) {
 
     // 취소 이유: 모달 전체화면으로 변경
     // 모달 바깥 영역 클릭 시 모달 닫기. show off & modal off------//
@@ -143,7 +145,7 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal}) 
     //-------------------------------------------------------------------------//
 
     return (
-       <Article ref={articleContainer}>
+       <Article ref={articleContainer} isShowOn={isProjectShow}>
             <TopContainer>
                 <TopWidthContainer imgWidth={imgWidth}>
                     <TopLeftIconContainer>
@@ -172,7 +174,7 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal}) 
 
 
                 {isInfo &&
-                <ProjectInfoContainer moveY={followY}>
+                <ProjectInfoContainer moveY={followY} isShowOn={isInfoShow}>
                     <ProjectTittle>
                         {projectInfo.tittle}
                     </ProjectTittle>
@@ -234,12 +236,32 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal}) 
 }
 
 
-ProjectModal.defaultProps = {
-    projectInfo: "",
-    closeModal: ()=>{},
-}
+// animation for project modal : zoom in or zoom out
+const projectZoomIn = keyframes`
+  from{
+    clip-path: polygon(40% 40%, 60% 40%, 60% 60%, 40% 60%);
+    opacity: 0.1;
+  }
+  to{
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 1;
+  }
+`
+const projectZoomOut = keyframes`
+  0% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 1;
+  }
+ 90%{
+    clip-path: polygon(40% 40%, 60% 40%, 60% 60%, 40% 60%);
+    opacity: 0;
+  }
+ 100%{
+    clip-path: polygon(40% 40%, 60% 40%, 60% 60%, 40% 60%);
+    opacity: 0;
 
-
+  }
+`
 const Article = styled.article`
     position: fixed;
     top: 0;
@@ -254,6 +276,12 @@ const Article = styled.article`
     flex-direction: column;
     align-items: center;
 
+    
+    animation-name:${(props)=>props.isShowOn? projectZoomIn : projectZoomOut};
+    animation-direction: normal;
+    animation-duration:${(props)=>props.isShowOn? "0.5s" : "0.7s"};
+    animation-fill-mode: forwards; //애니메이션 종료 후 마지막 keyframe 값 유지(중요!)
+    
     @media only screen and (min-width:1024px) {
     }
 
@@ -296,10 +324,12 @@ const TopIconContainer = styled.div`
         height: 35px;
     }
 
-    &:hover{
-    cursor: pointer;
-    opacity: 0.5;
-  }
+    @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+      opacity: 0.5;
+     }
+    }
 `
 
 const ImgContainer = styled.div`
@@ -365,10 +395,12 @@ const SizingArrowContainer = styled.div`
         right: ${props=>props.left? "" : `${(props.articleWidth - props.imgWidth)/2 - 50 - 0}px`};
     }
 
-    &:hover{
-    cursor: pointer;
-    opacity: 0.5;
-  }
+    @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+      opacity: 0.5;
+     }
+    }
 `
 
 const ProjectImg = styled.img`
@@ -376,6 +408,30 @@ const ProjectImg = styled.img`
     height: 100%; //미설정 시 height가 부모의 height에 맞추어 세로로 길게 늘려짐. 100%이면 늘려지지 않고 그대로 출력, 대신 스크롤 내리면 아래 여백 보임
 `
 
+
+// animation for project info modal
+const infoShowOn = keyframes`
+  from{
+    clip-path: circle(0.0% at 0 100%);
+    opacity: 0.1;
+  }
+  to{
+    clip-path: circle(141.2% at 0 100%);
+    opacity: 1;
+  }
+`
+const infoShowOff = keyframes`
+  0% {
+    clip-path: circle(141.2% at 0 100%);
+    opacity: 1;
+  }
+
+ 100%{
+    clip-path: circle(0.0% at 0 100%);
+    opacity: 0;
+
+  }
+`
 const ProjectInfoContainer = styled.div`
     position: absolute;
     top: ${props=>props.moveY}px; //미적용 시 이미지 컨테이너에서 스크롤을 내릴 때 info컨테이너가 화면에 보이지 않음
@@ -390,6 +446,12 @@ const ProjectInfoContainer = styled.div`
     @media only screen and (min-width:1024px) {
         /* left: 100%; */
     }
+
+    animation-name:${(props)=>props.isShowOn? infoShowOn : infoShowOff};
+    animation-direction: normal;
+    animation-duration:${(props)=>props.isShowOn? "0.5s" : "0.7s"};
+    animation-fill-mode: forwards; //애니메이션 종료 후 마지막 keyframe 값 유지(중요!)
+    
 `
 const ProjectTittle = styled.h2`
 
@@ -420,10 +482,12 @@ const ViewButton = styled.button`
     border: 0;
     border-left: ${props=>props.left===1? "0.5px solid rgba(255,255,255,0.3)" : ""};
 
-    &:hover{
-    cursor: pointer;
-    opacity: 0.5;
-  }
+    @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+      opacity: 0.5;
+     }
+    }
 `
 const PaperContainer = styled.div`
     position: absolute;
@@ -445,10 +509,12 @@ const PaperContainer = styled.div`
 
     }
 
-    &:hover{
-    cursor: pointer;
-    opacity: 0.5;
-  }
+    @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+      opacity: 0.5;
+     }
+    }
 `
 const ScrollSetContainer = styled.div`
     display: flex;
@@ -474,8 +540,10 @@ const ScrollContainer = styled.div`
     width: 40px;
     height: 40px;
 
-    &:hover{
-    cursor: pointer;
-    opacity: 0.5;
+    @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+      opacity: 0.5;
+     }
     }
 `

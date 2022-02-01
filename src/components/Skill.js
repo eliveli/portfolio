@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Text,Icon} from './elements';
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 function Skill() {
 
@@ -57,14 +57,21 @@ const SkillContainer = styled.div`
 
 //각 스킬 별 컴포넌트
 const SkillItem = ({dataIcon,skillName,percentage}) => {
+    const [isFillUp, handleFillUp] = useState(false); // state for filling up skill box
+    const handleFillBox = () => { //fill up and disappear
+        handleFillUp(true);
+        setTimeout(()=>handleFillUp(false),2000);
+    }
+        
+
     return (
-        <SkillItemContainer>
+        <SkillItemContainer onClick={handleFillBox}>
             <IconContainer>
                 <Icon color="#555" dataIcon={dataIcon}></Icon>
             </IconContainer>
             <SkillName>{skillName}</SkillName>
             <SkillPercentBox>
-                <SkillPercentFilled percent={percentage}/>
+                <SkillPercentFilled percent={percentage} isFillUp={isFillUp} />
             </SkillPercentBox>
         </SkillItemContainer>
     );
@@ -100,6 +107,12 @@ const SkillItemContainer = styled.div`
     align-items: center;
     
     width: 100px;
+        
+    @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+     }
+    }
 `
 const SkillName = styled.span`
     width: 100%;
@@ -111,7 +124,23 @@ const SkillPercentBox = styled.div`
     display: flex;
     background-color: lightgray;
 `
+// animation for filling up skill box
+const fillUp = keyframes`
+    from{
+        clip-path: inset(0 100% 0 0);
+    }
+    to{
+        clip-path: inset(0 0 0 0);
+        background-color: orange;
+    }
+`
 const SkillPercentFilled = styled.div`
     width: ${(props) => props.percent}%;
     background-color: #555;
+
+    animation-name:${(props)=>props.isFillUp? fillUp : ""};
+    animation-direction: normal;
+    animation-duration:${(props)=>props.isFillUp? "0.9s" : "0.7s"};
+    animation-fill-mode: forwards; //애니메이션 종료 후 마지막 keyframe 값 유지(중요!)
+
 `

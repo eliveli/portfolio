@@ -132,9 +132,11 @@ const BurgerContainer = styled.div`
       display: none;
     }
   
-  &:hover{
-  cursor: pointer;
-  }
+    @media (hover: hover) { //마우스 hover만 작동. hover 불가능한 모바일 기기에서의 사이드이펙트 제거
+     &:hover {
+      cursor: pointer;
+     }
+    }
 `
 
 
@@ -221,11 +223,13 @@ const NavText = styled.h3`
   display: inline;
   color: white;
 
-  &:hover{
-    cursor: pointer;
-    text-decoration: underline dotted 2px orange;
-    color: orange;
-  }
+  @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+      text-decoration: underline dotted 2px orange;
+      color: orange;
+     }
+    }
   
   @media screen and (max-width: 767px) {
   }

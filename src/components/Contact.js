@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, Icon} from './elements';
 import useModal from '../hooks/useModal';
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 
 function Contact() {
@@ -27,7 +27,7 @@ function Contact() {
             {/* 플랫폼별 연락처 */}
             <ContactInfoContainer>
                 {Array.from({length:3}, (e,index) => 
-                    <ContactItem key={`contactItem${index}`} dataIcon={propsDataIcon[index]} platform={propsPlatform[index]} contactInfo={propsContactInfo[index]} isContactInfo={contactModals[index].isModal} handleContactInfo={contactModals[index].handleModal} />
+                    <ContactItem key={`contactItem${index}`} dataIcon={propsDataIcon[index]} platform={propsPlatform[index]} contactInfo={propsContactInfo[index]} isContactInfo={contactModals[index].isModal} handleContactInfo={contactModals[index].handleModal} isShowOn={contactModals[index].isShowModal}/>
                 )}
             </ContactInfoContainer>
         </Section>);
@@ -45,10 +45,12 @@ const Section = styled.section`
     /* 상위 element부터 width 설정해야 하위 element에 width % 로 설정 가능. */
 `
 const A = styled.a`
-  &:hover{
-    cursor: pointer;
-    opacity: 0.5;
-  }
+    @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+      opacity: 0.5;
+     }
+    }
 `
 const GithubIcon = styled.span`
     width: 50px;
@@ -76,19 +78,20 @@ const ContactInfoContainer = styled.div`
 
 // 각 연락처 플랫폼. 아이콘 클릭 시 연락처 open or close
 const ContactItem = (props) => {
-    const {dataIcon,platform,contactInfo,isContactInfo,handleContactInfo} = props;
+    const {dataIcon,platform,contactInfo,isContactInfo,handleContactInfo,isShowOn} = props;
     return (
         // onClick 이벤트핸들러 component 적용 가능. not only element
         <SkillItemContainer onClick={handleContactInfo}>
             <Icon dataIcon={dataIcon} color="#666" ></Icon>
             <SkillName>{platform}</SkillName>
             {isContactInfo && 
-             <OpenedInfoBox>
-                 <OpenedInfo>{contactInfo}</OpenedInfo>
+             <OpenedInfoBox isShowOn={isShowOn}>
+                 <OpenedInfo platform={platform}>{contactInfo}</OpenedInfo>
              </OpenedInfoBox> }
             {/* 바로 윗줄, 새로 추가되는 노드는 컴포넌트 맨 위에 위치하면(두 줄 위로 이동 시) 적용 안 됨(추가정보필요) */}
         </SkillItemContainer>
     )}
+
 
 
 const SkillItemContainer = styled.div`
@@ -105,12 +108,36 @@ const SkillItemContainer = styled.div`
     /* width %로 적용 시 부모에 대한 비율/형제와의 간격을 고려 */
     /* (유의) width 100%를 넣으면 상위 element에 주었던 justify content 정렬이 안 먹힘 */
 
-    &:hover{
-    cursor: pointer;
-    opacity: 0.5;
-  }
+    @media (hover: hover) {
+     &:hover {
+      cursor: pointer;
+      opacity: 0.5;
+     }
+    }
 `
 
+// animation for contact info
+const infoShowOn = keyframes`
+  0%{
+    clip-path: circle(2.5% at 50% 50%);
+    opacity: 0.1;
+  }
+  99%{
+    clip-path: circle(70.7% at 50% 50%);
+    opacity: 1;
+  }
+`
+const infoShowOff = keyframes`
+  0% {
+    clip-path: circle(70.7% at 50% 50%);
+    opacity: 1;
+  }
+
+  100%{
+     clip-path: circle(2.5% at 50% 50%);
+     opacity: 0;
+   }
+  `
 // 아이콘 클릭 시 보여줄 정보
 const OpenedInfoBox = styled.div`
     position: absolute;
@@ -122,13 +149,24 @@ const OpenedInfoBox = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+
+    
+    animation-name:${(props)=>props.isShowOn? infoShowOn : infoShowOff};
+    animation-direction: normal;
+    animation-duration:${(props)=>props.isShowOn? "0.5s" : "0.7s"};
+    animation-fill-mode: forwards; //애니메이션 종료 후 마지막 keyframe 값 유지(중요!)
+
 `
 const OpenedInfo = styled.p`
     color: black;
     z-index: 2;
     text-align: center;
-    font-size: 25px;
+    font-size: 24px;
     font-weight: 900;
+
+    ${props=>props.platform==="카톡"?
+        "align-self: flex-start;" : ""}
+
 `
 const SkillName = styled.span`
     width: 100%;
