@@ -141,7 +141,7 @@ const BurgerContainer = styled.div`
 // animation for Navigation bar : slide in or slide out
 const navSlideIn = keyframes`
   from{
-    top:-100vw;
+    top:-80px;
   }
   to{
     top:0;
@@ -152,7 +152,7 @@ const navSlideOut = keyframes`
     top:0;
   }
   to{
-    top:-100vw;
+    top:-80px;;
   }
 `
 
@@ -160,18 +160,18 @@ const navSlideOut = keyframes`
 // animation for mobile hamburger button : slide in or slide out
 const mobileSlideIn = keyframes`
   from{
-    left:-100vw;
+    top:-100vh;
   }
   to{
-    left:0;
+    top:0;
   }
 `
 const mobileSlideOut = keyframes`
   from{
-    left:0;
+    top:0;
   }
   to{
-    left:-100vw;
+    top:-100vh;
   }
 `
 
@@ -211,10 +211,8 @@ const UlMobile = styled.ul`
 
   animation-name:${(props)=>props.isShowOn? mobileSlideIn : mobileSlideOut};
   animation-direction: normal;
-  animation-duration:0.5s;
+  animation-duration:0.7s;
   animation-fill-mode: forwards; //애니메이션 종료 후 마지막 keyframe 값 유지(중요!)
-  
-
 `
 const LiMobile = styled.li`
   margin-left: 0;
