@@ -28,4 +28,4 @@ const HomeTittle = styled.h1`
 const HomeDesc = styled.p`
 
 `
-export default React.memo(Home);
+export default Home;

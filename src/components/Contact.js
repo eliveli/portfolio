@@ -33,7 +33,7 @@ function Contact() {
         </Section>);
       }
 
-export default React.memo(Contact);
+export default Contact;
 
 const Section = styled.section`
     display: flex;

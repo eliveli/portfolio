@@ -2,16 +2,18 @@ import React, {useRef} from "react";
 import {Contact, Home, Navbar, Projects, Skill} from "./components";
 import styled from "styled-components";
 
+
 function App() {
   // 여러 개의 ref를 하나로 묶기. [ref, ref, ref]
   const sectionRef = useRef([]);
   sectionRef.current = [0,0,0,0].map((element, index)=>React.createRef());
   // 윗줄 끝부분 React.createRef() 가능. useRef 불가.
 
+  // 특정 섹션으로 화면 스크롤
   function scrollTo(index) {
     sectionRef.current[index].current.scrollIntoView({ behavior: 'smooth' })
   }
-  
+
   return (
     <>
       <Navbar handleScrollTo={scrollTo} />
@@ -28,6 +30,8 @@ function App() {
     </>
   );
 }
+
+
 
 const MainPart = styled.main`
   max-width: 800px;

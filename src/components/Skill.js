@@ -20,7 +20,7 @@ function Skill() {
         </Section>);
 }
 
-export default React.memo(Skill);
+export default Skill;
 
 const Section = styled.section`
     display: flex;
