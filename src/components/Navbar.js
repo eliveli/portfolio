@@ -1,46 +1,77 @@
-import {useState, useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Icon } from './elements';
-import useModal from '../hooks/useModal';
 import usePreventScroll from "../hooks/usePreventScroll"
+import useModal, {useShowOn} from "../hooks/useModal";
+import {throttle} from "lodash";
+
 export default function Navbar({handleScrollTo}) {
-  const {isModal, handleModal, isShowOn} = useModal();
+  const {isModal, handleModal, isShowModal} = useModal(); //버튼 클릭하는 모바일용 모달
 
-  usePreventScroll(isModal); // 모달 띄운 동안 body 영역 스크롤 막기
+  usePreventScroll(isModal); // 모바일용 모달 띄운 동안 body 영역 스크롤 막기
+
+  //navigation bar : animation show on or show off
+  const {handleShow, isShowOn} = useShowOn(); //state for animation: show on or show off
+  const prevScrollY = useRef(0); //이전 스크롤 Y
   
+  const handleShowNavi = () => {
+    const presentScrollY = document.documentElement.scrollTop;
+    if (!isShowOn && presentScrollY === 0) { //scroll top then show on
+      handleShow(); // show on
+    } else if (!isShowOn && (presentScrollY < prevScrollY.current)) { //scroll up then show on
+      handleShow(); // show on
+    } else if (isShowOn && (presentScrollY > prevScrollY.current)) { //scroll down then show off
+      handleShow(); // show off
+    }
+    prevScrollY.current = presentScrollY;
+  }
+  const handleThrottle = throttle(handleShowNavi, 400); // throttle 이용 렌더링 줄임
+  const handleNavi = () => {
+      handleThrottle();
+  }
+  
+  useEffect(()=> {
+    window.addEventListener("scroll", handleNavi);
+    return ()=> window.removeEventListener("scroll", handleNavi);
+  }, [isShowOn])
+  // [] dependency를 빈 배열로 주면 함수가 업데이트 되지 않음.
+  // 이 때 함수에서 참조하는 상태가 바뀌어도 초기 상태값을 이용함. 상태를 새롭게 읽어오지 못했음.
+  // 함수 업데이트. isShowOn 을 deps 로 넣어주니 컴포넌트가 언마운트되고 다시 마운트될 때 함수가 바뀐 상태를 읽어옴
+
   return (
-    <NavBar>
-        {/* 모바일용 햄버거 버튼. 클릭 on off 구분 */}
-        {!isModal &&
-        <BurgerContainer onClick={handleModal}>
-          <Icon dataIcon="charm:menu-hamburger" color="white" width="40px" height="40px" /> 
-        </BurgerContainer>
-        }
-        {isModal &&
-        <BurgerContainer click={true} onClick={handleModal}>
-          <Icon dataIcon="charm:menu-hamburger" color="orange" width="40px" height="40px" /> 
-        </BurgerContainer>
-        }
+    <NavBar isShowNav={isShowOn}>
 
-        <LogoContainer>
-          <img src="" alt="logo"></img>
-        </LogoContainer>
+      {/* hamburger button for Mobile. click on or click off */}
+      {!isModal &&
+      <BurgerContainer onClick={handleModal}>
+        <Icon dataIcon="charm:menu-hamburger" color="white" width="40px" height="40px" /> 
+      </BurgerContainer>
+      }
+      {isModal &&
+      <BurgerContainer click={true} onClick={handleModal}>
+        <Icon dataIcon="charm:menu-hamburger" color="orange" width="40px" height="40px" /> 
+      </BurgerContainer>
+      }
 
-        {/* 태블릿 사이즈~ 뷰*/}
-        <UlTablet>
-            {["Home","Skills","Projects","Contact"].map((section,idx)=>
-              <LiTablet key={`Nav${idx}`}><NavText onClick={()=>handleScrollTo(idx)}>{section}</NavText></LiTablet>
-            )}
-        </UlTablet>
+      <LogoContainer>
+        <img src="" alt="logo"></img>
+      </LogoContainer>
 
-        {/* 모바일 사이즈 뷰*/}
-        {isModal && 
-        <UlMobile isShowOn={isShowOn}>
-            {["Home","Skills","Projects","Contact"].map((section,idx)=>
-              <LiMobile key={`Nav${idx}`}><NavText onClick={()=>{handleScrollTo(idx);handleModal();}}>{section}</NavText></LiMobile>
-            )}
-        </UlMobile>
-        }
+      {/* view for tablet/desktop */}
+      <UlTablet>
+          {["Home","Skills","Projects","Contact"].map((section,idx)=>
+            <LiTablet key={`Nav${idx}`}><NavText onClick={()=>handleScrollTo(idx)}>{section}</NavText></LiTablet>
+          )}
+      </UlTablet>
+
+      {/* view for mobile */}
+      {isModal && 
+      <UlMobile isShowOn={isShowModal}>
+          {["Home","Skills","Projects","Contact"].map((section,idx)=>
+            <LiMobile key={`Nav${idx}`}><NavText onClick={()=>{handleScrollTo(idx);handleModal();}}>{section}</NavText></LiMobile>
+          )}
+      </UlMobile>
+      }
     </NavBar>
   )
 
@@ -73,17 +104,20 @@ const NavBar = styled.nav`
     justify-content: space-between;
     align-items: center;
 
+    //navigation bar animation: show on or show off
+    animation-name:${(props)=>props.isShowNav? navSlideIn : navSlideOut};
+    animation-direction: normal;
+    animation-duration:0.5s;
+    animation-fill-mode: forwards;
+        
     @media screen and (max-width: 767px) {
       justify-content: center;
-
     }
 `
 const LogoContainer = styled.div`
     margin-left: 24px;
     @media screen and (max-width: 767px) {
-
     }
-
 `
 const BurgerContainer = styled.div`
   position: absolute;
@@ -103,8 +137,28 @@ const BurgerContainer = styled.div`
   }
 `
 
-// animation slide in or slide out
-const slideIn = keyframes`
+
+// animation for Navigation bar : slide in or slide out
+const navSlideIn = keyframes`
+  from{
+    top:-100vw;
+  }
+  to{
+    top:0;
+  }
+`
+const navSlideOut = keyframes`
+  from{
+    top:0;
+  }
+  to{
+    top:-100vw;
+  }
+`
+
+
+// animation for mobile hamburger button : slide in or slide out
+const mobileSlideIn = keyframes`
   from{
     left:-100vw;
   }
@@ -112,7 +166,7 @@ const slideIn = keyframes`
     left:0;
   }
 `
-const slideOut = keyframes`
+const mobileSlideOut = keyframes`
   from{
     left:0;
   }
@@ -155,7 +209,7 @@ const UlMobile = styled.ul`
   height: 100vh;
   background-color: rgba(40,40,40,1);
 
-  animation-name:${(props)=>props.isShowOn? slideIn : slideOut};
+  animation-name:${(props)=>props.isShowOn? mobileSlideIn : mobileSlideOut};
   animation-direction: normal;
   animation-duration:0.5s;
   animation-fill-mode: forwards; //애니메이션 종료 후 마지막 keyframe 값 유지(중요!)

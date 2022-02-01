@@ -26,10 +26,10 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal}) 
     usePreventScroll(isProjectModal); // 모달 띄운 동안 body 영역 스크롤 막기
 
     // 프로젝트 info 모달(paper버튼 클릭 시)
-    const { isModal, handleModal, isShowOn} = useModal();
+    const { isModal, handleModal, isShowModal } = useModal();
     const isInfo = isModal;
     const handleInfo = () => handleModal();
-    const isInfoShow = isShowOn;
+    const isInfoShow = isShowModal;
     
     
     // article 컨테이너의 width, height 값 가져오기 //여러 아이콘 정렬에 활용 //window.screen.availWidth 제대로 적용 안 됨. 스크린 사이즈가 아니라 컴포넌트 사이즈를 가져오자
@@ -99,10 +99,10 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal}) 
 
         setFollowY(top); //info 컨테이너 top 값 변경 : y스크롤 따라 이동(화면 중앙 유지)
 
-        if (top > 10) handleUp(true); // scroll Up 아이콘 표시여부 결정
+        if (top > 10) handleUp(true); // scroll Up 아이콘 표시여부 결정.
         else handleUp(false);
 
-        if (top >= moveY-40) handleDown(false);// scroll Down 아이콘 표시여부 결정
+        if (top >= moveY-40) handleDown(false);// scroll Down 아이콘 표시여부 결정. 이미지 최하단 부근에서 아이콘 숨기기
         else handleDown(true);
     }
     const handleScrollY = debounce(setScrollY, 200); // debounce 이용 렌더링 줄임
