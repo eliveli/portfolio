@@ -158,7 +158,7 @@ const OpenedInfoBox = styled.div`
 
 `
 const OpenedInfo = styled.p`
-    color: black;
+    color: orange;
     z-index: 2;
     text-align: center;
     font-size: 24px;
