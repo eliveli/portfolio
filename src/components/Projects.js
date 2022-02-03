@@ -4,12 +4,12 @@ import styled from "styled-components";
 import ProjectModal from "./ProjectModal";
 import useModal from '../hooks/useModal';
 import { projectInfo } from '../assets/projectInfo';
-import imgEx from "../assets/ImgEx.png";
+import webtooni from "../assets/webtooni_main.jpg"
 
 const Projects = () => {
   
   // 프로젝트별 이미지
-  const projectImgs = [imgEx,imgEx,imgEx,imgEx];
+  const projectImgs = [webtooni,webtooni,webtooni,webtooni];
   
   // 프로젝트별 모달 설정 함수 모음
   const projectModals = [useModal(),useModal(),useModal(),useModal()];
@@ -54,9 +54,9 @@ const Section = styled.section`
 const ImgContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    border: 1px solid black;
     gap: 20px;
     padding: 20px;
+    box-sizing: border-box;
 
     @media only screen and (max-width: 760px) {
         grid-template-columns: 1fr;
@@ -64,10 +64,13 @@ const ImgContainer = styled.div`
 `
 
 const Img = styled.img`
+  box-sizing: border-box;
+  box-shadow: 0 0 4px #666;
   @media (hover: hover) {
     &:hover {
-    cursor: pointer;
-    opacity: 0.5;
+      cursor: pointer;
+      opacity: 0.5;
+      box-shadow: 0 0 4px orange;
     }
   }
 `
