@@ -168,10 +168,9 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal, i
                     {deviceImg.map((e,idx) => 
                       <ProjectImg ref={(elem)=>imgRef.current[idx]=elem} width={imgWidth} key={e+idx} src={e} alt="project image" />
                     )}
+
                 
                 </ImgAlbum>
-
-
 
                 {isInfo &&
                 <ProjectInfoContainer moveY={followY} isShowOn={isInfoShow}>
@@ -185,7 +184,14 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal, i
                 }
             </ImgContainer>
 
-            
+            {/* 마지막 이미지일 때 보여줄 문구 */}
+            {(imageX===lastImgX) &&
+            <ShowMessage articleWidth={articleWidth} imgWidth={imgWidth}>
+               더 보려면? 👇🏻
+            </ShowMessage>
+            }
+
+
             {/* 이전 이미지 화살표(맨 처음 이미지일 때 제외) */}
             { (imageX!==firstImgX && !isInfo) &&
             <SizingArrowContainer articleWidth={articleWidth} articleHeight={articleHeight} imgWidth={imgWidth} left={true} onClick={()=>changeImg(imageX+imgWidth)}>
@@ -351,7 +357,6 @@ const ImgContainer = styled.div`
     }
 `
 const ImgAlbum = styled.div`
-    /* width: 100%; */
     display: flex;
 
     transition-duration:0.5s;
@@ -364,6 +369,50 @@ const ImgAlbum = styled.div`
     /* ${(props)=>props.moveY? `transform:translate(${props.moveX}px,-${props.moveY}px);` :""} */
 `
 
+const shakeMessage = keyframes`
+    from{
+        bottom: ${50+3+6}px;
+    }
+    to{
+        bottom: ${50+3}px;
+    }
+`
+const ShowMessage = styled.div`
+    position: absolute;
+    left: ${42+3+3 +3}px;
+    bottom: ${50+3 +2}px;
+    /* border: 2px solid #ddd; */
+    border-radius: 5px;
+    background-color: rgba(255,255,255,0.9);
+    padding: 1px 5px;
+    box-shadow: 0 0 4px #666;
+
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: #666;
+
+    animation-name:${shakeMessage};
+    animation-direction: normal;
+    animation-duration: 0.5s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+
+    @media only screen and (min-width:1024px) {
+        left: ${props=>(props.articleWidth - props.imgWidth)/2 + 6}px;
+        bottom: ${50+ 5}px;
+    }
+
+    @media (hover: hover) {
+     &:hover {
+        animation-name:"";
+     }
+    }
+
+
+
+`
 
 const SizingArrowContainer = styled.div`
     background-color: rgba(255,255,255,0.9);
