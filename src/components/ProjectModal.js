@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect, createRef, useCallback} from 'react';
+import {useState, useRef} from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Icon } from './elements';
 import useModal from '../hooks/useModal';
@@ -50,9 +50,11 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal, i
     // 디바이스별 이미지 분리 열람-----------------------//
     const {mobile, tablet, desktop} = projectInfo.img;
     const device = [mobile, tablet, desktop]; //배열에 담아 인덱스로 접근(for <DeviceContainer> 컴포넌트)
-    const [deviceImg, setDeviceImg] = useState(mobile);
-    const handleDevice = (idx) => {
+    const [deviceImg, setDeviceImg] = useState(mobile); //for 디바이스별 이미지 선택
+    const [selectedDevice, handleSelectedDevice] = useState("mobile"); //for 선택된 디바이스 아이콘 표시
+    const handleDevice = (idx, deviceName) => {
         setDeviceImg(device[idx]);
+        handleSelectedDevice(deviceName);
 
         // 디바이스 변경 시 x좌표 및 스크롤위치 초기화. 이미지 개수가 많은 디바이스에서 적은 디바이스로 변경 시 설정된 이미지 x좌표에 이미지가 없거나 y좌표가 여백일 수 있기 때문.
         changeImageX(0);
@@ -149,10 +151,12 @@ export default function ProjectModal({projectInfo, closeModal, isProjectModal, i
             <TopContainer>
                 <TopWidthContainer imgWidth={imgWidth}>
                     <TopLeftIconContainer>
-                        {["gridicons:phone","gridicons:tablet","fa-solid:desktop"]
-                        .map((dataIcon,idx)=>
-                            <TopIconContainer onClick={()=>handleDevice(idx)} key={dataIcon}>
-                                <Icon color="#777" dataIcon={dataIcon}></Icon>
+                        {[{dataIcon:"gridicons:phone", device:"mobile"},
+                        {dataIcon:"gridicons:tablet", device:"tablet"},
+                        {dataIcon:"fa-solid:desktop", device:"desktop"}]
+                        .map((_,idx)=>
+                            <TopIconContainer deviceName={_.device} selectedDevice={selectedDevice} onClick={()=>handleDevice(idx, _.device)} key={_.dataIcon}>
+                                <Icon color="#777" dataIcon={_.dataIcon}></Icon>
                             </TopIconContainer>
                         )}
                     </TopLeftIconContainer>
@@ -322,7 +326,7 @@ const TopIconContainer = styled.div`
     width: 27px;
     height: 27px;
     background-color: rgba(255,255,255,1);
-    border: 2px solid #ddd;
+    border: ${props=>props.deviceName && (props.deviceName===props.selectedDevice)? "2px solid orange" : "2px solid #ddd"};
     border-radius: 20%;
     
     @media only screen and (min-width:768px) {
