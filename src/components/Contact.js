@@ -3,7 +3,7 @@ import { Text, Icon } from "./elements";
 import useModal from "../hooks/useModal";
 import styled, { keyframes } from "styled-components";
 
-// in client-side, CRA provides dotenv. // dotenv is for node. do not install it.
+// in client-side, CRA provides dotenv. // It is for node to install it. Don't do that...
 // not import dotenv. just use. // of course .env file is necessary
 // " REACT_APP " is required for env in cra! Add it before your custom env.
 
